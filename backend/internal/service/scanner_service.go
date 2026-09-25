@@ -1,9 +1,13 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -11,6 +15,91 @@ import (
 	"veya/backend/internal/models"
 	"veya/backend/internal/repository"
 )
+
+var reYear = regexp.MustCompile(`(19\d\d|20\d\d)`)
+
+func parseAudioDuration(filePath string) float64 {
+	cmd := exec.Command("ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprintwrappers=1:nokey=1", filePath)
+	out, err := cmd.Output()
+	if err == nil {
+		str := strings.TrimSpace(string(out))
+		if d, err := strconv.ParseFloat(str, 64); err == nil && d > 0 {
+			return d
+		}
+	}
+	return 0
+}
+
+func extractYearFromRaw(raw map[string]interface{}) int {
+	if raw == nil {
+		return 0
+	}
+	for k, val := range raw {
+		upperK := strings.ToUpper(k)
+		if upperK == "TYER" || upperK == "TDRC" || upperK == "TDRB" || upperK == "YEAR" || upperK == "DATE" || upperK == "©DAY" || strings.Contains(upperK, "DAY") || strings.Contains(upperK, "DATE") {
+			var strVal string
+			switch v := val.(type) {
+			case string:
+				strVal = v
+			case []byte:
+				strVal = string(v)
+			}
+			if match := reYear.FindString(strVal); match != "" {
+				var y int
+				if _, err := fmt.Sscanf(match, "%d", &y); err == nil && y >= 1900 && y <= 2100 {
+					return y
+				}
+			}
+		}
+	}
+	return 0
+}
+
+type ffprobeStreamFormatTags struct {
+	Format struct {
+		Tags map[string]string `json:"tags"`
+	} `json:"format"`
+	Streams []struct {
+		Tags map[string]string `json:"tags"`
+	} `json:"streams"`
+}
+
+func extractYearWithFFprobe(filePath string) int {
+	cmd := exec.Command("ffprobe", "-v", "error", "-show_entries", "format_tags:stream_tags", "-of", "json", filePath)
+	out, err := cmd.Output()
+	if err != nil {
+		return 0
+	}
+	var data ffprobeStreamFormatTags
+	if err := json.Unmarshal(out, &data); err != nil {
+		return 0
+	}
+
+	checkTags := func(tags map[string]string) int {
+		for k, v := range tags {
+			upperK := strings.ToUpper(k)
+			if upperK == "DATE" || upperK == "YEAR" || upperK == "CREATION_TIME" || upperK == "TYER" || upperK == "TDRC" || upperK == "TDRB" || strings.Contains(upperK, "DAY") || strings.Contains(upperK, "DATE") {
+				if match := reYear.FindString(v); match != "" {
+					var y int
+					if _, err := fmt.Sscanf(match, "%d", &y); err == nil && y >= 1900 && y <= 2100 {
+						return y
+					}
+				}
+			}
+		}
+		return 0
+	}
+
+	if y := checkTags(data.Format.Tags); y > 0 {
+		return y
+	}
+	for _, stream := range data.Streams {
+		if y := checkTags(stream.Tags); y > 0 {
+			return y
+		}
+	}
+	return 0
+}
 
 var supportedExtensions = map[string]bool{
 	".mp3":  true,
@@ -132,7 +221,7 @@ func (s *ScannerService) runScan() {
 		size := fi.Size()
 
 		if meta, exists := existingMeta[path]; exists {
-			if meta.FileSize == size && meta.ModifiedAt == mtime {
+			if meta.FileSize == size && meta.ModifiedAt == mtime && meta.Year >= 1900 && meta.Year <= 2100 && meta.Duration > 0 {
 				s.mu.Lock()
 				s.status.Scanned++
 				s.status.Progress = int((float64(i+1) / float64(len(discoveredFiles))) * 100)
@@ -190,6 +279,12 @@ func (s *ScannerService) processAudioFile(filePath string, size, mtime int64, is
 		song.Album = strings.TrimSpace(m.Album())
 		song.Genre = strings.TrimSpace(m.Genre())
 		song.Year = m.Year()
+
+		// Fallback ID3 string year extraction if m.Year() returned invalid year (< 1900 or > 2100)
+		if song.Year < 1900 || song.Year > 2100 {
+			song.Year = extractYearFromRaw(m.Raw())
+		}
+
 		trackNo, _ := m.Track()
 		discNo, _ := m.Disc()
 		song.TrackNumber = trackNo
@@ -207,6 +302,16 @@ func (s *ScannerService) processAudioFile(filePath string, size, mtime int64, is
 		}
 	}
 
+	// Secondary fallback using ffprobe stream/format tags if year is still invalid
+	if song.Year < 1900 || song.Year > 2100 {
+		song.Year = extractYearWithFFprobe(filePath)
+	}
+
+	// Final sanitize: if still invalid, force 0
+	if song.Year < 1900 || song.Year > 2100 {
+		song.Year = 0
+	}
+
 	if song.Title == "" {
 		base := filepath.Base(filePath)
 		song.Title = strings.TrimSuffix(base, filepath.Ext(base))
@@ -221,7 +326,11 @@ func (s *ScannerService) processAudioFile(filePath string, size, mtime int64, is
 		song.Album = "Unknown Album"
 	}
 
-	if song.Duration <= 0 {
+	// Extract accurate audio duration using ffprobe
+	exactDuration := parseAudioDuration(filePath)
+	if exactDuration > 0 {
+		song.Duration = exactDuration
+	} else if song.Duration <= 0 {
 		song.Duration = float64(size) / (128.0 * 1024.0 / 8.0)
 		if song.Duration < 5 {
 			song.Duration = 180.0

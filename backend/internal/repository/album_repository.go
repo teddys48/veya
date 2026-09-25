@@ -23,12 +23,18 @@ func (r *AlbumRepository) GetOrCreate(title, albumArtist string, year int, cover
 	if albumArtist == "" {
 		albumArtist = "Unknown Artist"
 	}
+	if year < 1900 || year > 2100 {
+		year = 0
+	}
 
 	var id int64
 	err := r.db.QueryRow("SELECT id FROM albums WHERE title = ? AND album_artist = ?", title, albumArtist).Scan(&id)
 	if err == nil {
 		if coverHash != "" {
 			_, _ = r.db.Exec("UPDATE albums SET cover_hash = ? WHERE id = ? AND (cover_hash IS NULL OR cover_hash = '')", coverHash, id)
+		}
+		if year >= 1900 && year <= 2100 {
+			_, _ = r.db.Exec("UPDATE albums SET year = ? WHERE id = ? AND (year IS NULL OR year < 1900 OR year > 2100)", year, id)
 		}
 		return id, nil
 	}

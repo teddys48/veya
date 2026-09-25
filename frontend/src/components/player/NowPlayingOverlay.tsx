@@ -12,6 +12,7 @@ export const NowPlayingOverlay: React.FC = () => {
     queueIndex,
     isShuffle,
     shuffleOrder,
+    duration,
     isExpanded,
     toggleExpanded,
     playQueueAt,
@@ -45,6 +46,9 @@ export const NowPlayingOverlay: React.FC = () => {
   const displayQueue = isShuffle && shuffleOrder.length === queue.length
     ? shuffleOrder.map((qIdx) => ({ song: queue[qIdx], originalIndex: qIdx }))
     : queue.map((song, qIdx) => ({ song, originalIndex: qIdx }));
+
+  // Fallback year calculation: use currentSong.year if between 1900 and 2100, otherwise 'Unknown'
+  const displayYear = currentSong.year >= 1900 && currentSong.year <= 2100 ? currentSong.year : 'Unknown';
 
   return (
     <div
@@ -85,7 +89,7 @@ export const NowPlayingOverlay: React.FC = () => {
               alt={currentSong.title}
               className="w-64 h-64 sm:w-80 sm:h-80 lg:w-[420px] lg:h-[420px] object-cover border-4 border-black shadow-[8px_8px_0px_0px_#000] bg-gray-200 transition-transform duration-300 group-hover:scale-102"
               onError={(e) => {
-                (e.target as HTMLImageElement).src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>';
+                (e.target as HTMLImageElement).src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>';
               }}
             />
           </div>
@@ -151,12 +155,15 @@ export const NowPlayingOverlay: React.FC = () => {
                     ? `/api/covers/${song.cover_hash}`
                     : `/api/songs/${song.id}/cover`;
 
+                  // For currently playing track, use live decoded audio duration if available
+                  const trackDurationSec = isCurrent && duration > 0 ? duration : song.duration;
+
                   return (
                     <div
                       key={`${song.id}-${idx}`}
                       className={`neo-box-sm p-2 flex items-center justify-between gap-3 transition-all ${
                         isCurrent
-                          ? 'bg-[var(--primary)] text-black font-extrabold shadow-[3px_3px_0px_0px_#000]'
+                          ? '!bg-[var(--primary)] !text-black font-extrabold shadow-[3px_3px_0px_0px_#000]'
                           : 'hover:bg-[var(--muted-bg)] text-[var(--fg)]'
                       }`}
                     >
@@ -165,7 +172,7 @@ export const NowPlayingOverlay: React.FC = () => {
                         className="flex items-center gap-3 flex-1 min-w-0 text-left cursor-pointer"
                       >
                         <div className="w-8 text-center text-xs font-bold shrink-0">
-                          {isCurrent ? <Play className="w-4 h-4 fill-current mx-auto" /> : idx + 1}
+                          {isCurrent ? <Play className="w-4 h-4 fill-black text-black mx-auto" /> : idx + 1}
                         </div>
                         <img
                           src={itemCoverUrl}
@@ -176,13 +183,13 @@ export const NowPlayingOverlay: React.FC = () => {
                           }}
                         />
                         <div className="truncate">
-                          <p className="font-bold text-sm truncate">{song.title}</p>
-                          <p className="text-xs opacity-80 truncate">{song.artist}</p>
+                          <p className={`font-bold text-sm truncate ${isCurrent ? '!text-black' : ''}`}>{song.title}</p>
+                          <p className={`text-xs opacity-90 truncate ${isCurrent ? '!text-black' : ''}`}>{song.artist}</p>
                         </div>
                       </button>
 
-                      <span className="text-xs font-semibold px-2 shrink-0">
-                        {formatTime(song.duration)}
+                      <span className={`text-xs font-semibold px-2 shrink-0 ${isCurrent ? '!text-black font-extrabold' : ''}`}>
+                        {formatTime(trackDurationSec)}
                       </span>
                     </div>
                   );
@@ -196,8 +203,8 @@ export const NowPlayingOverlay: React.FC = () => {
                 <p><span className="font-bold">Artist:</span> {currentSong.artist}</p>
                 <p><span className="font-bold">Album:</span> {currentSong.album}</p>
                 <p><span className="font-bold">Format:</span> {currentSong.format.toUpperCase()} ({(currentSong.file_size / (1024 * 1024)).toFixed(2)} MB)</p>
-                <p><span className="font-bold">Duration:</span> {formatTime(currentSong.duration)}</p>
-                <p><span className="font-bold">Year:</span> {currentSong.year > 0 ? currentSong.year : '-'}</p>
+                <p><span className="font-bold">Duration:</span> {formatTime(duration > 0 ? duration : currentSong.duration)}</p>
+                <p><span className="font-bold">Year:</span> {displayYear}</p>
               </div>
             </div>
           )}

@@ -91,7 +91,7 @@ export const AlbumDetailPage: React.FC = () => {
           </h1>
           <p className="font-mono text-base font-extrabold text-[var(--muted)]">{album.album_artist}</p>
           <div className="flex items-center justify-center sm:justify-start gap-4 font-mono text-xs font-bold pt-2 text-[var(--fg)]">
-            <span>{album.year > 0 ? album.year : ''}</span>
+            <span>{album.year >= 1900 && album.year <= 2100 ? album.year : ''}</span>
             <span>•</span>
             <span>{songs.length} SONGS</span>
           </div>

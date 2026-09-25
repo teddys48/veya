@@ -16,6 +16,8 @@ type FileMeta struct {
 	ID         int64
 	FileSize   int64
 	ModifiedAt int64
+	Year       int
+	Duration   float64
 }
 
 func NewSongRepository(db *sql.DB) *SongRepository {
@@ -164,7 +166,7 @@ func (r *SongRepository) GetByID(id int64) (*models.Song, error) {
 }
 
 func (r *SongRepository) GetAllFileMetadata() (map[string]FileMeta, error) {
-	rows, err := r.db.Query("SELECT id, file_path, file_size, modified_at FROM songs")
+	rows, err := r.db.Query("SELECT id, file_path, file_size, modified_at, year, duration FROM songs")
 	if err != nil {
 		return nil, fmt.Errorf("failed to query song file metadata: %w", err)
 	}
@@ -175,10 +177,12 @@ func (r *SongRepository) GetAllFileMetadata() (map[string]FileMeta, error) {
 		var id int64
 		var path string
 		var size, mtime int64
-		if err := rows.Scan(&id, &path, &size, &mtime); err != nil {
+		var year int
+		var duration float64
+		if err := rows.Scan(&id, &path, &size, &mtime, &year, &duration); err != nil {
 			return nil, err
 		}
-		metaMap[path] = FileMeta{ID: id, FileSize: size, ModifiedAt: mtime}
+		metaMap[path] = FileMeta{ID: id, FileSize: size, ModifiedAt: mtime, Year: year, Duration: duration}
 	}
 	return metaMap, nil
 }

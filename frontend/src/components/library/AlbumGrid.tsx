@@ -84,7 +84,7 @@ export const AlbumGrid: React.FC<AlbumGridProps> = ({ albums }) => {
                 {album.album_artist}
               </p>
               <div className="flex items-center justify-between mt-2 pt-2 border-t-2 border-black/20 text-[10px] font-mono font-bold text-[var(--fg)]">
-                <span>{album.year > 0 ? album.year : ''}</span>
+                <span>{album.year >= 1900 && album.year <= 2100 ? album.year : ''}</span>
                 <span>{album.song_count} TRACKS</span>
               </div>
             </div>

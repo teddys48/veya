@@ -71,7 +71,16 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
       }
     },
     onDurationChange: (duration) => {
-      set({ duration });
+      const state = get();
+      if (state.currentSong && duration > 0) {
+        const updatedCurrent = { ...state.currentSong, duration };
+        const updatedQueue = state.queue.map((s, idx) =>
+          idx === state.queueIndex ? updatedCurrent : s
+        );
+        set({ duration, currentSong: updatedCurrent, queue: updatedQueue });
+      } else {
+        set({ duration });
+      }
     },
     onEnded: () => {
       const state = get();
