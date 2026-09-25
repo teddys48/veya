@@ -13,7 +13,7 @@ export interface SongTableProps {
 }
 
 export const SongTable: React.FC<SongTableProps> = ({ songs, playlists = [], onPlaylistsChange }) => {
-  const { currentSong, isPlaying, playSong, addToQueue, playNext } = usePlayerStore();
+  const { currentSong, isPlaying, playSong } = usePlayerStore();
   const [selectedSongForPlaylist, setSelectedSongForPlaylist] = useState<Song | null>(null);
 
   const handleToggleFavorite = async (song: Song) => {
@@ -95,17 +95,26 @@ export const SongTable: React.FC<SongTableProps> = ({ songs, playlists = [], onP
                     </button>
                   </td>
 
-                  {/* Title & Artwork */}
+                  {/* Title & Artwork with Hover Play Button Overlay */}
                   <td className="p-3">
                     <div className="flex items-center gap-3">
-                      <img
-                        src={coverUrl}
-                        alt={song.title}
-                        className="w-9 h-9 object-cover border border-black shrink-0 bg-gray-200"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>';
-                        }}
-                      />
+                      <div
+                        onClick={() => playSong(song, songs)}
+                        className="relative w-10 h-10 border border-black shrink-0 bg-gray-200 overflow-hidden group/img cursor-pointer"
+                      >
+                        <img
+                          src={coverUrl}
+                          alt={song.title}
+                          className="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-200"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>';
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/img:opacity-100 flex items-center justify-center transition-opacity">
+                          <Play className="w-5 h-5 text-[var(--primary)] fill-current" />
+                        </div>
+                      </div>
+
                       <div className="truncate">
                         <p className="font-extrabold truncate text-[var(--fg)]">{song.title}</p>
                         <p className="text-xs text-[var(--muted)] md:hidden truncate">{song.artist}</p>
@@ -138,10 +147,10 @@ export const SongTable: React.FC<SongTableProps> = ({ songs, playlists = [], onP
                       {playlists.length > 0 && (
                         <button
                           onClick={() => setSelectedSongForPlaylist(song)}
-                          className="p-1.5 hover:bg-[var(--primary)] border border-black transition-colors cursor-pointer"
+                          className="p-1.5 hover:bg-[var(--primary)] border border-black transition-colors cursor-pointer text-black"
                           title="Add to Playlist"
                         >
-                          <Plus className="w-4 h-4 text-black" />
+                          <Plus className="w-4 h-4" />
                         </button>
                       )}
                     </div>
@@ -157,7 +166,7 @@ export const SongTable: React.FC<SongTableProps> = ({ songs, playlists = [], onP
       {selectedSongForPlaylist && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
           <div className="neo-box p-6 bg-[var(--card-bg)] max-w-sm w-full space-y-4">
-            <h3 className="font-black text-lg uppercase">Add to Playlist</h3>
+            <h3 className="font-black text-lg uppercase text-[var(--fg)]">Add to Playlist</h3>
             <p className="text-xs font-mono text-[var(--muted)] truncate">"{selectedSongForPlaylist.title}"</p>
             <div className="space-y-2 max-h-48 overflow-y-auto">
               {playlists.map((pl) => (

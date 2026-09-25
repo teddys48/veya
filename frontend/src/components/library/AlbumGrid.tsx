@@ -46,13 +46,13 @@ export const AlbumGrid: React.FC<AlbumGridProps> = ({ albums }) => {
             onClick={() => navigate(`/albums/${album.id}`)}
             className="cursor-pointer group flex flex-col justify-between"
           >
-            {/* Album Cover Art */}
-            <div className="relative aspect-square w-full mb-3 overflow-hidden border-2 border-black bg-gray-200 shadow-[2px_2px_0px_0px_#000]">
+            {/* Album Cover Art with Hover Play Button Overlay */}
+            <div className="relative aspect-square w-full mb-3 overflow-hidden border-2 border-black bg-gray-200 shadow-[2px_2px_0px_0px_#000] group">
               {coverUrl ? (
                 <img
                   src={coverUrl}
                   alt={album.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = 'none';
                   }}
@@ -63,19 +63,21 @@ export const AlbumGrid: React.FC<AlbumGridProps> = ({ albums }) => {
                 </div>
               )}
 
-              {/* Hover Quick Play Button */}
-              <button
-                onClick={(e) => handlePlayAlbum(e, album.id)}
-                className="absolute bottom-2 right-2 p-3 bg-[var(--primary)] text-black border-2 border-black shadow-[3px_3px_0px_0px_#000] opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110 cursor-pointer"
-                title="Play Album"
-              >
-                <Play className="w-5 h-5 fill-current" />
-              </button>
+              {/* Hover Play Button Overlay */}
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center">
+                <button
+                  onClick={(e) => handlePlayAlbum(e, album.id)}
+                  className="neo-btn p-3 bg-[var(--primary)] text-black rounded-full border-2 border-black shadow-[3px_3px_0px_0px_#000] hover:scale-110 active:scale-95 transition-all cursor-pointer"
+                  title="Play Album"
+                >
+                  <Play className="w-6 h-6 fill-current ml-0.5" />
+                </button>
+              </div>
             </div>
 
             {/* Title & Info */}
             <div>
-              <h4 className="font-extrabold text-base truncate text-[var(--fg)] group-hover:text-[var(--primary-hover)]">
+              <h4 className="font-extrabold text-base truncate text-[var(--fg)] group-hover:text-[var(--primary)]">
                 {album.title}
               </h4>
               <p className="text-xs font-mono text-[var(--muted)] truncate mt-0.5">

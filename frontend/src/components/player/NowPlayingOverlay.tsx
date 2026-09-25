@@ -10,16 +10,17 @@ export const NowPlayingOverlay: React.FC = () => {
     currentSong,
     queue,
     queueIndex,
+    isShuffle,
+    shuffleOrder,
     isExpanded,
     toggleExpanded,
     playQueueAt,
-    removeFromQueue,
   } = usePlayerStore();
 
   const [isFav, setIsFav] = useState(currentSong?.is_favorite || false);
   const [activeTab, setActiveTab] = useState<'queue' | 'lyrics'>('queue');
 
-  if (!isExpanded || !currentSong) return null;
+  if (!currentSong) return null;
 
   const handleToggleFavorite = async () => {
     if (!currentSong) return;
@@ -40,13 +41,24 @@ export const NowPlayingOverlay: React.FC = () => {
     ? `/api/covers/${currentSong.cover_hash}`
     : `/api/songs/${currentSong.id}/cover`;
 
+  // Dynamically compute display list based on active shuffle state
+  const displayQueue = isShuffle && shuffleOrder.length === queue.length
+    ? shuffleOrder.map((qIdx) => ({ song: queue[qIdx], originalIndex: qIdx }))
+    : queue.map((song, qIdx) => ({ song, originalIndex: qIdx }));
+
   return (
-    <div className="fixed inset-0 z-40 bg-[var(--bg)] text-[var(--fg)] flex flex-col overflow-hidden pb-36 animate-in slide-in-from-bottom duration-300">
+    <div
+      className={`fixed inset-0 z-40 bg-[var(--bg)] text-[var(--fg)] flex flex-col overflow-hidden pb-36 transition-all duration-300 ease-in-out ${
+        isExpanded
+          ? 'translate-y-0 opacity-100 pointer-events-auto'
+          : 'translate-y-full opacity-0 pointer-events-none'
+      }`}
+    >
       {/* Top Header Bar */}
       <div className="p-4 border-b-3 border-black bg-[var(--card-bg)] flex items-center justify-between shrink-0 shadow-[0_4px_0px_0px_#000]">
         <Button variant="ghost" size="sm" onClick={toggleExpanded} className="gap-2">
           <ChevronDown className="w-5 h-5" />
-          <span className="font-extrabold uppercase">COLLAPSE</span>
+          <span className="font-extrabold uppercase">COLLAPSE PLAYER</span>
         </Button>
 
         <div className="text-center truncate max-w-md">
@@ -54,7 +66,7 @@ export const NowPlayingOverlay: React.FC = () => {
             NOW PLAYING
           </span>
           <p className="font-mono text-xs font-bold truncate text-[var(--muted)] mt-1">
-            DIPUTAR DARI: {currentSong.album}
+            PLAYING FROM: {currentSong.album}
           </p>
         </div>
 
@@ -110,7 +122,7 @@ export const NowPlayingOverlay: React.FC = () => {
               }`}
             >
               <ListMusic className="w-4 h-4" />
-              <span>BERIKUTNYA ({queue.length})</span>
+              <span>UP NEXT ({queue.length})</span>
             </button>
             <button
               onClick={() => setActiveTab('lyrics')}
@@ -121,20 +133,20 @@ export const NowPlayingOverlay: React.FC = () => {
               }`}
             >
               <Music className="w-4 h-4" />
-              <span>INFO LAGU</span>
+              <span>SONG INFO</span>
             </button>
           </div>
 
           {/* Tab Content */}
           {activeTab === 'queue' ? (
             <div className="flex-1 overflow-y-auto p-3 space-y-2 font-mono">
-              {queue.length === 0 ? (
+              {displayQueue.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center p-8 text-center text-[var(--muted)]">
-                  <p className="font-bold">Antrean kosong</p>
+                  <p className="font-bold">Queue is empty</p>
                 </div>
               ) : (
-                queue.map((song, idx) => {
-                  const isCurrent = idx === queueIndex;
+                displayQueue.map(({ song, originalIndex }, idx) => {
+                  const isCurrent = originalIndex === queueIndex;
                   const itemCoverUrl = song.cover_hash
                     ? `/api/covers/${song.cover_hash}`
                     : `/api/songs/${song.id}/cover`;
@@ -149,7 +161,7 @@ export const NowPlayingOverlay: React.FC = () => {
                       }`}
                     >
                       <button
-                        onClick={() => playQueueAt(idx)}
+                        onClick={() => playQueueAt(originalIndex)}
                         className="flex items-center gap-3 flex-1 min-w-0 text-left cursor-pointer"
                       >
                         <div className="w-8 text-center text-xs font-bold shrink-0">
@@ -180,12 +192,12 @@ export const NowPlayingOverlay: React.FC = () => {
           ) : (
             <div className="flex-1 overflow-y-auto p-6 font-mono space-y-4 text-sm text-[var(--fg)]">
               <div className="neo-box-sm p-4 space-y-2 bg-[var(--muted-bg)]">
-                <p><span className="font-bold">Judul:</span> {currentSong.title}</p>
-                <p><span className="font-bold">Artis:</span> {currentSong.artist}</p>
+                <p><span className="font-bold">Title:</span> {currentSong.title}</p>
+                <p><span className="font-bold">Artist:</span> {currentSong.artist}</p>
                 <p><span className="font-bold">Album:</span> {currentSong.album}</p>
                 <p><span className="font-bold">Format:</span> {currentSong.format.toUpperCase()} ({(currentSong.file_size / (1024 * 1024)).toFixed(2)} MB)</p>
-                <p><span className="font-bold">Durasi:</span> {formatTime(currentSong.duration)}</p>
-                <p><span className="font-bold">Tahun:</span> {currentSong.year > 0 ? currentSong.year : '-'}</p>
+                <p><span className="font-bold">Duration:</span> {formatTime(currentSong.duration)}</p>
+                <p><span className="font-bold">Year:</span> {currentSong.year > 0 ? currentSong.year : '-'}</p>
               </div>
             </div>
           )}

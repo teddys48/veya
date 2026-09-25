@@ -50,6 +50,15 @@ function generateShuffleOrder(length: number, currentIndex: number): number[] {
   return [currentIndex, ...filtered];
 }
 
+// Rehydrate settings from localStorage
+const savedVolume = parseFloat(localStorage.getItem('veya_volume') || '0.8');
+const savedMuted = localStorage.getItem('veya_muted') === 'true';
+const savedShuffle = localStorage.getItem('veya_shuffle') === 'true';
+const savedRepeat = (localStorage.getItem('veya_repeat') as RepeatMode) || 'off';
+
+audioEngine.setVolume(savedMuted ? 0 : savedVolume);
+audioEngine.setMuted(savedMuted);
+
 export const usePlayerStore = create<PlayerState>((set, get) => {
   audioEngine.setCallbacks({
     onTimeUpdate: (currentTime) => {
@@ -89,11 +98,11 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
     queueIndex: -1,
     shuffleOrder: [],
     shuffleIndex: -1,
-    isShuffle: false,
-    repeatMode: 'off',
+    isShuffle: savedShuffle,
+    repeatMode: savedRepeat,
     isPlaying: false,
-    volume: 0.8,
-    isMuted: false,
+    volume: savedVolume,
+    isMuted: savedMuted,
     progress: 0,
     duration: 0,
     hasLoggedHistory: false,
@@ -239,19 +248,22 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
 
     setVolume: (volume) => {
       audioEngine.setVolume(volume);
+      localStorage.setItem('veya_volume', String(volume));
       set({ volume, isMuted: volume === 0 });
     },
 
     toggleMute: () => {
-      const { isMuted } = get();
+      const { isMuted, volume } = get();
       const nextMuted = !isMuted;
       audioEngine.setMuted(nextMuted);
+      localStorage.setItem('veya_muted', String(nextMuted));
       set({ isMuted: nextMuted });
     },
 
     toggleShuffle: () => {
       const { isShuffle, queue, queueIndex } = get();
       const nextShuffle = !isShuffle;
+      localStorage.setItem('veya_shuffle', String(nextShuffle));
 
       if (nextShuffle) {
         const shuffleOrder = generateShuffleOrder(queue.length, queueIndex >= 0 ? queueIndex : 0);
@@ -264,6 +276,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
     cycleRepeat: () => {
       const { repeatMode } = get();
       const nextMode: RepeatMode = repeatMode === 'off' ? 'all' : repeatMode === 'all' ? 'one' : 'off';
+      localStorage.setItem('veya_repeat', nextMode);
       set({ repeatMode: nextMode });
     },
 

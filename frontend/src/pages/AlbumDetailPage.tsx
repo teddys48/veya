@@ -64,14 +64,22 @@ export const AlbumDetailPage: React.FC = () => {
 
       {/* Album Header Banner */}
       <div className="neo-box p-6 bg-[var(--card-bg)] flex flex-col sm:flex-row items-center sm:items-end gap-6">
-        <div className="w-40 h-40 border-3 border-black bg-gray-200 shadow-[4px_4px_0px_0px_#000] shrink-0 overflow-hidden">
+        <div
+          onClick={handlePlayAlbum}
+          className="relative w-40 h-40 border-3 border-black bg-gray-200 shadow-[4px_4px_0px_0px_#000] shrink-0 overflow-hidden group cursor-pointer"
+        >
           {coverUrl ? (
-            <img src={coverUrl} alt={album.title} className="w-full h-full object-cover" />
+            <img src={coverUrl} alt={album.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-[var(--primary)] text-black">
               <Disc className="w-16 h-16" />
             </div>
           )}
+          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+            <div className="neo-btn p-3 bg-[var(--primary)] text-black rounded-full border-2 border-black shadow-[3px_3px_0px_0px_#000]">
+              <Play className="w-8 h-8 fill-current ml-1" />
+            </div>
+          </div>
         </div>
 
         <div className="space-y-2 text-center sm:text-left flex-1 min-w-0">
@@ -82,7 +90,7 @@ export const AlbumDetailPage: React.FC = () => {
             {album.title}
           </h1>
           <p className="font-mono text-base font-extrabold text-[var(--muted)]">{album.album_artist}</p>
-          <div className="flex items-center justify-center sm:justify-start gap-4 font-mono text-xs font-bold pt-2">
+          <div className="flex items-center justify-center sm:justify-start gap-4 font-mono text-xs font-bold pt-2 text-[var(--fg)]">
             <span>{album.year > 0 ? album.year : ''}</span>
             <span>•</span>
             <span>{songs.length} SONGS</span>
