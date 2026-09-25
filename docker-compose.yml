@@ -1,0 +1,25 @@
+services:
+  music:
+    image: ghcr.io/username/veya:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: veya_music
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./music:/music:ro
+      - ./data:/data
+    environment:
+      PORT: 8080
+      MUSIC_DIR: /music
+      DB_PATH: /data/veya.db
+      COVERS_DIR: /data/covers
+      LOG_LEVEL: info
+      ENV: production
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/api/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped

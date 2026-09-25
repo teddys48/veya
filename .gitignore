@@ -1,0 +1,27 @@
+# Frontend
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+backend/cmd/server/dist/
+.vite/
+.env
+.env.*
+
+# Backend
+backend/bin/
+backend/server
+backend/cmd/server/server
+tmp/
+*.log
+data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# General & OS
+.DS_Store
+.idea/
+.vscode/
+coverage/

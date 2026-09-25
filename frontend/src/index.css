@@ -1,0 +1,152 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg: #F5F3EF;
+    --fg: #0F0F12;
+    --card-bg: #FFFFFF;
+    --primary: #FFE600;
+    --primary-hover: #FFD600;
+    --accent-pink: #FF69B4;
+    --accent-cyan: #00E5FF;
+    --accent-green: #A3E635;
+    --accent-orange: #FF8400;
+    --border-color: #000000;
+    --shadow-color: #000000;
+    --muted: #6B7280;
+    --muted-bg: #E5E7EB;
+  }
+
+  html.dark {
+    --bg: #141419;
+    --fg: #F3F4F6;
+    --card-bg: #1E1E26;
+    --primary: #FFE600;
+    --primary-hover: #FFD600;
+    --accent-pink: #FF69B4;
+    --accent-cyan: #00E5FF;
+    --accent-green: #A3E635;
+    --accent-orange: #FF8400;
+    --border-color: #000000;
+    --shadow-color: #000000;
+    --muted: #9CA3AF;
+    --muted-bg: #2A2A36;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+}
+
+/* NeoBrutalism Design Utilities */
+.neo-box {
+  background-color: var(--card-bg);
+  border: 3px solid var(--border-color);
+  box-shadow: 4px 4px 0px 0px var(--shadow-color);
+}
+
+.neo-box-sm {
+  background-color: var(--card-bg);
+  border: 2px solid var(--border-color);
+  box-shadow: 2px 2px 0px 0px var(--shadow-color);
+}
+
+.neo-btn {
+  background-color: var(--primary);
+  color: #000000;
+  font-weight: 700;
+  border: 2.5px solid var(--border-color);
+  box-shadow: 3px 3px 0px 0px var(--shadow-color);
+  transition: all 0.15s ease-in-out;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  user-select: none;
+}
+
+.neo-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0px 0px var(--shadow-color);
+}
+
+.neo-btn:active {
+  transform: translate(0px, 0px);
+  box-shadow: 1px 1px 0px 0px var(--shadow-color);
+}
+
+.neo-btn-accent {
+  background-color: var(--accent-cyan);
+}
+
+.neo-btn-pink {
+  background-color: var(--accent-pink);
+}
+
+.neo-btn-green {
+  background-color: var(--accent-green);
+}
+
+.neo-btn-ghost {
+  background-color: var(--card-bg);
+  color: var(--fg);
+}
+
+.neo-card {
+  background-color: var(--card-bg);
+  border: 3px solid var(--border-color);
+  box-shadow: 4px 4px 0px 0px var(--shadow-color);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.neo-card:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 7px 7px 0px 0px var(--shadow-color);
+}
+
+.neo-input {
+  background-color: var(--card-bg);
+  color: var(--fg);
+  border: 2.5px solid var(--border-color);
+  box-shadow: 3px 3px 0px 0px var(--shadow-color);
+  padding: 0.5rem 0.75rem;
+  font-family: inherit;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+
+.neo-input:focus {
+  outline: none;
+  box-shadow: 5px 5px 0px 0px var(--shadow-color);
+  transform: translate(-1px, -1px);
+}
+
+.neo-badge {
+  background-color: var(--primary);
+  color: #000000;
+  border: 2px solid var(--border-color);
+  box-shadow: 2px 2px 0px 0px var(--shadow-color);
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--muted);
+  border: 2px solid var(--border-color);
+}
