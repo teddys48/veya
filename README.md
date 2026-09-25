@@ -6,7 +6,17 @@ A production-ready, self-hosted web music player featuring a distinct NeoBrutali
 
 ## Screenshots
 
-> Screenshots will be added here.
+### Home Dashboard
+![Home Dashboard](docs/Screenshot_20260925_135907.png)
+
+### Songs Library
+![Songs Library](docs/Screenshot_20260925_135927.png)
+
+### Albums Grid
+![Albums Grid](docs/Screenshot_20260925_135938.png)
+
+### Expanded Now Playing Overlay & Up Next Queue
+![Now Playing Overlay](docs/Screenshot_20260925_142220.png)
 
 ---
 

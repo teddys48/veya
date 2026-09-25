@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Play,
   Pause,
@@ -51,6 +51,32 @@ export const PlayerBar: React.FC = () => {
 
   const [isQueueOpen, setIsQueueOpen] = useState(false);
   const [isFav, setIsFav] = useState(currentSong?.is_favorite || false);
+  const volumeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = volumeRef.current;
+    if (!el) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const step = 0.05;
+      const { volume, isMuted, setVolume } = usePlayerStore.getState();
+      const currentVol = isMuted ? 0 : volume;
+
+      if (e.deltaY < 0) {
+        // Scroll UP -> Increase volume
+        const newVol = Math.min(1, Math.round((currentVol + step) * 100) / 100);
+        setVolume(newVol);
+      } else if (e.deltaY > 0) {
+        // Scroll DOWN -> Decrease volume
+        const newVol = Math.max(0, Math.round((currentVol - step) * 100) / 100);
+        setVolume(newVol);
+      }
+    };
+
+    el.addEventListener('wheel', handleWheel, { passive: false });
+    return () => el.removeEventListener('wheel', handleWheel);
+  }, []);
 
   const handleToggleFavorite = async () => {
     if (!currentSong) return;
@@ -192,8 +218,12 @@ export const PlayerBar: React.FC = () => {
 
           {/* Right Controls (Volume, Maximize Overlay, Queue Drawer toggle) */}
           <div className="flex items-center gap-3 w-1/4 justify-end">
-            <div className="hidden sm:flex items-center gap-2 w-32">
-              <button onClick={toggleMute} className="cursor-pointer text-[var(--fg)]">
+            <div
+              ref={volumeRef}
+              className="hidden sm:flex items-center gap-2 w-36 py-1 px-1.5 rounded border border-transparent hover:border-black hover:bg-[var(--muted-bg)] transition-all cursor-pointer group shrink-0"
+              title="Scroll mouse wheel to adjust volume"
+            >
+              <button onClick={toggleMute} className="cursor-pointer text-[var(--fg)] shrink-0">
                 {isMuted || volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
               </button>
               <Slider
@@ -204,6 +234,9 @@ export const PlayerBar: React.FC = () => {
                 onChange={(val) => setVolume(val)}
                 ariaLabel="Volume control"
               />
+              <span className="font-mono text-[10px] font-extrabold w-8 text-right text-[var(--muted)] group-hover:text-[var(--fg)] shrink-0">
+                {isMuted ? '0%' : `${Math.round(volume * 100)}%`}
+              </span>
             </div>
 
             <Button
