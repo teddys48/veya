@@ -48,28 +48,28 @@ export const HomePage: React.FC = () => {
 
   return (
     <div className="space-y-8 pb-16">
-      {/* Hero Banner */}
-      <div className="neo-box bg-[var(--primary)] text-black p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative overflow-hidden">
+      {/* Hero Banner with Dark Mode Adaptability */}
+      <div className="neo-box bg-[var(--card-bg)] text-[var(--fg)] p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative overflow-hidden">
         <div className="space-y-3 z-10">
-          <div className="inline-flex items-center gap-2 bg-black text-white font-mono text-xs font-bold px-3 py-1 uppercase tracking-widest border border-black shadow-[2px_2px_0px_0px_#fff]">
-            <Sparkles className="w-3.5 h-3.5 text-[var(--primary)]" />
+          <div className="inline-flex items-center gap-2 bg-[var(--primary)] text-black font-mono text-xs font-bold px-3 py-1 uppercase tracking-widest border-2 border-black shadow-[2px_2px_0px_0px_#000]">
+            <Sparkles className="w-3.5 h-3.5" />
             <span>SELF-HOSTED MUSIC ENGINE</span>
           </div>
-          <h1 className="font-black text-3xl sm:text-4xl uppercase tracking-tighter">
+          <h1 className="font-black text-3xl sm:text-4xl uppercase tracking-tighter text-[var(--fg)]">
             YOUR MUSIC, YOUR RULES.
           </h1>
-          <p className="font-mono text-sm font-bold opacity-90 max-w-lg">
+          <p className="font-mono text-sm font-bold text-[var(--muted)] max-w-lg">
             High performance self-hosted playback with instant range streaming and NeoBrutalism design.
           </p>
           <div className="pt-2 flex gap-3">
-            <Button variant="accent" onClick={handlePlayAllRecent} disabled={songs.length === 0}>
+            <Button variant="primary" onClick={handlePlayAllRecent} disabled={songs.length === 0}>
               <Play className="w-4 h-4 fill-current" />
               <span>PLAY ALL RECENT</span>
             </Button>
           </div>
         </div>
 
-        <div className="hidden lg:flex w-32 h-32 bg-black text-[var(--primary)] border-3 border-black items-center justify-center font-black text-4xl shadow-[4px_4px_0px_0px_#fff] shrink-0">
+        <div className="hidden lg:flex w-32 h-32 bg-[var(--primary)] text-black border-3 border-black items-center justify-center font-black text-4xl shadow-[4px_4px_0px_0px_#000] shrink-0">
           VEYA
         </div>
       </div>

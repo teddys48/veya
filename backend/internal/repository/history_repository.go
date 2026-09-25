@@ -100,8 +100,14 @@ func (r *HistoryRepository) GetHistory(page, limit int) (*models.PaginatedRespon
 		)
 		if err == nil {
 			s.IsFavorite = (isFav == 1)
-			s.CreatedAt, _ = time.Parse("2006-01-02 15:04:05", songCreatedStr)
-			h.PlayedAt, _ = time.Parse("2006-01-02 15:04:05", playedStr)
+			if t, parseErr := time.Parse("2006-01-02 15:04:05", songCreatedStr); parseErr == nil {
+				s.CreatedAt = t
+			}
+			if t, parseErr := time.ParseInLocation("2006-01-02 15:04:05", playedStr, time.UTC); parseErr == nil {
+				h.PlayedAt = t
+			} else if t, parseErr := time.Parse(time.RFC3339, playedStr); parseErr == nil {
+				h.PlayedAt = t
+			}
 			h.Song = &s
 			history = append(history, h)
 		}

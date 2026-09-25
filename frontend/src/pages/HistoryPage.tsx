@@ -2,9 +2,23 @@ import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import { PlaybackHistory } from '../types';
 import { SectionHeader } from '../components/library/SectionHeader';
-import { formatTime } from '../components/player/PlayerBar';
 import { usePlayerStore } from '../stores/usePlayerStore';
 import { History, Play } from 'lucide-react';
+
+function formatHistoryDate(dateStr: string): string {
+  if (!dateStr) return '-';
+  const normalized = dateStr.includes('T') ? dateStr : dateStr.replace(' ', 'T') + 'Z';
+  const d = new Date(normalized);
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleString('id-ID', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  });
+}
 
 export const HistoryPage: React.FC = () => {
   const [history, setHistory] = useState<PlaybackHistory[]>([]);
@@ -64,8 +78,8 @@ export const HistoryPage: React.FC = () => {
                       <td className="p-3 font-extrabold truncate">{song.title}</td>
                       <td className="p-3 font-semibold truncate">{song.artist}</td>
                       <td className="p-3 hidden sm:table-cell text-[var(--muted)] truncate">{song.album}</td>
-                      <td className="p-3 text-right text-xs text-[var(--muted)]">
-                        {new Date(h.played_at).toLocaleString()}
+                      <td className="p-3 text-right text-xs text-[var(--muted)] font-bold">
+                        {formatHistoryDate(h.played_at)}
                       </td>
                     </tr>
                   );

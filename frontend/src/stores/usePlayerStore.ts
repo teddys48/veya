@@ -16,6 +16,7 @@ interface PlayerState {
   progress: number;
   duration: number;
   hasLoggedHistory: boolean;
+  isExpanded: boolean;
 
   // Actions
   playSong: (song: Song, newQueue?: Song[]) => void;
@@ -35,11 +36,12 @@ interface PlayerState {
   removeFromQueue: (index: number) => void;
   clearQueue: () => void;
   reorderQueue: (from: number, to: number) => void;
+  toggleExpanded: () => void;
+  setExpanded: (expanded: boolean) => void;
 }
 
 function generateShuffleOrder(length: number, currentIndex: number): number[] {
   const indices = Array.from({ length }, (_, i) => i);
-  // Remove current index, shuffle remaining, put current index at head
   const filtered = indices.filter((i) => i !== currentIndex);
   for (let i = filtered.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -49,13 +51,11 @@ function generateShuffleOrder(length: number, currentIndex: number): number[] {
 }
 
 export const usePlayerStore = create<PlayerState>((set, get) => {
-  // Bind AudioEngine event callbacks to Zustand store
   audioEngine.setCallbacks({
     onTimeUpdate: (currentTime) => {
       const state = get();
       set({ progress: currentTime });
 
-      // Record history if played >= 30 seconds and not already logged for this playback session
       if (currentTime >= 30 && state.currentSong && !state.hasLoggedHistory) {
         set({ hasLoggedHistory: true });
         recordHistory(state.currentSong.id);
@@ -97,9 +97,9 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
     progress: 0,
     duration: 0,
     hasLoggedHistory: false,
+    isExpanded: false,
 
     playSong: (song, newQueue) => {
-      const state = get();
       const targetQueue = newQueue && newQueue.length > 0 ? newQueue : [song];
       const index = targetQueue.findIndex((s) => s.id === song.id);
       const activeIndex = index >= 0 ? index : 0;
@@ -198,13 +198,11 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
       const { queue, queueIndex, progress, isShuffle, shuffleOrder, shuffleIndex } = get();
       if (queue.length === 0) return;
 
-      // Smart Previous rule: progress > 3s -> restart song
       if (progress > 3) {
         audioEngine.seek(0);
         return;
       }
 
-      // Jump to previous track
       let prevQueueIndex = -1;
       let prevShuffleIndex = shuffleIndex;
 
@@ -245,7 +243,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
     },
 
     toggleMute: () => {
-      const { isMuted, volume } = get();
+      const { isMuted } = get();
       const nextMuted = !isMuted;
       audioEngine.setMuted(nextMuted);
       set({ isMuted: nextMuted });
@@ -331,6 +329,9 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
         };
       });
     },
+
+    toggleExpanded: () => set((state) => ({ isExpanded: !state.isExpanded })),
+    setExpanded: (expanded) => set({ isExpanded: expanded }),
   };
 });
 
