@@ -13,18 +13,13 @@ export interface SongTableProps {
 }
 
 export const SongTable: React.FC<SongTableProps> = ({ songs, playlists = [], onPlaylistsChange }) => {
-  const { currentSong, isPlaying, playSong } = usePlayerStore();
+  const { currentSong, isPlaying, playSong, toggleFavorite } = usePlayerStore();
   const [selectedSongForPlaylist, setSelectedSongForPlaylist] = useState<Song | null>(null);
 
   const handleToggleFavorite = async (song: Song) => {
     try {
-      if (song.is_favorite) {
-        await api.removeFavorite(song.id);
-        song.is_favorite = false;
-      } else {
-        await api.addFavorite(song.id);
-        song.is_favorite = true;
-      }
+      song.is_favorite = !song.is_favorite;
+      await toggleFavorite(song.id);
       onPlaylistsChange?.();
     } catch (err) {
       console.error('Failed to update favorite:', err);

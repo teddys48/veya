@@ -16,13 +16,14 @@ export const NowPlayingOverlay: React.FC = () => {
     isExpanded,
     toggleExpanded,
     playQueueAt,
+    toggleFavorite,
   } = usePlayerStore();
 
-  const [isFav, setIsFav] = useState(currentSong?.is_favorite || false);
   const [activeTab, setActiveTab] = useState<'queue' | 'lyrics'>('queue');
   const activeTrackRef = useRef<HTMLDivElement | null>(null);
 
   const displayQueue = getDisplayQueue(queue, isShuffle, shuffleOrder);
+  const isFav = currentSong?.is_favorite || false;
 
   useEffect(() => {
     if (isExpanded && activeTab === 'queue' && activeTrackRef.current) {
@@ -31,21 +32,6 @@ export const NowPlayingOverlay: React.FC = () => {
   }, [isExpanded, activeTab, queueIndex]);
 
   if (!currentSong) return null;
-
-  const handleToggleFavorite = async () => {
-    if (!currentSong) return;
-    try {
-      if (isFav) {
-        await api.removeFavorite(currentSong.id);
-        setIsFav(false);
-      } else {
-        await api.addFavorite(currentSong.id);
-        setIsFav(true);
-      }
-    } catch (err) {
-      console.error('Failed to toggle favorite:', err);
-    }
-  };
 
   const coverUrl = currentSong.cover_hash
     ? `/api/covers/${currentSong.cover_hash}`
@@ -104,7 +90,7 @@ export const NowPlayingOverlay: React.FC = () => {
                 {currentSong.title}
               </h2>
               <button
-                onClick={handleToggleFavorite}
+                onClick={() => toggleFavorite(currentSong.id)}
                 className="p-2 border-2 border-black bg-[var(--card-bg)] shadow-[2px_2px_0px_0px_#000] hover:scale-110 transition-transform cursor-pointer shrink-0"
                 title={isFav ? 'Remove Favorite' : 'Favorite'}
               >

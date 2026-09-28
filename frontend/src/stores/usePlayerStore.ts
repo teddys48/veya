@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { Song, RepeatMode } from '../types';
 import { audioEngine } from '../audio/audioEngine';
+import { api } from '../services/api';
 
 interface PlayerState {
   currentSong: Song | null;
@@ -38,6 +39,7 @@ interface PlayerState {
   reorderQueue: (from: number, to: number) => void;
   toggleExpanded: () => void;
   setExpanded: (expanded: boolean) => void;
+  toggleFavorite: (songId: number) => Promise<void>;
 }
 
 function generateShuffleOrder(length: number, currentIndex: number): number[] {
@@ -400,6 +402,51 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
 
     toggleExpanded: () => set((state) => ({ isExpanded: !state.isExpanded })),
     setExpanded: (expanded) => set({ isExpanded: expanded }),
+
+    toggleFavorite: async (songId) => {
+      const { currentSong, queue } = get();
+      const targetSong = currentSong?.id === songId ? currentSong : queue.find((s) => s.id === songId);
+      const isFav = targetSong?.is_favorite || false;
+      const nextFav = !isFav;
+
+      // Optimistically update store state immediately
+      set((state) => {
+        let updatedCurrent = state.currentSong;
+        if (state.currentSong && state.currentSong.id === songId) {
+          updatedCurrent = { ...state.currentSong, is_favorite: nextFav };
+        }
+
+        const updatedQueue = state.queue.map((s) =>
+          s.id === songId ? { ...s, is_favorite: nextFav } : s
+        );
+
+        return {
+          currentSong: updatedCurrent,
+          queue: updatedQueue,
+        };
+      });
+
+      try {
+        if (isFav) {
+          await api.removeFavorite(songId);
+        } else {
+          await api.addFavorite(songId);
+        }
+      } catch (err) {
+        console.error('Failed to update favorite on server:', err);
+        // Revert on error
+        set((state) => {
+          let updatedCurrent = state.currentSong;
+          if (state.currentSong && state.currentSong.id === songId) {
+            updatedCurrent = { ...state.currentSong, is_favorite: isFav };
+          }
+          const updatedQueue = state.queue.map((s) =>
+            s.id === songId ? { ...s, is_favorite: isFav } : s
+          );
+          return { currentSong: updatedCurrent, queue: updatedQueue };
+        });
+      }
+    },
   };
 });
 

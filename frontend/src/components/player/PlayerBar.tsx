@@ -47,10 +47,11 @@ export const PlayerBar: React.FC = () => {
     toggleShuffle,
     cycleRepeat,
     toggleExpanded,
+    toggleFavorite,
   } = usePlayerStore();
 
   const [isQueueOpen, setIsQueueOpen] = useState(false);
-  const [isFav, setIsFav] = useState(currentSong?.is_favorite || false);
+  const isFav = currentSong?.is_favorite || false;
   const volumeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -77,21 +78,6 @@ export const PlayerBar: React.FC = () => {
     el.addEventListener('wheel', handleWheel, { passive: false });
     return () => el.removeEventListener('wheel', handleWheel);
   }, []);
-
-  const handleToggleFavorite = async () => {
-    if (!currentSong) return;
-    try {
-      if (isFav) {
-        await api.removeFavorite(currentSong.id);
-        setIsFav(false);
-      } else {
-        await api.addFavorite(currentSong.id);
-        setIsFav(true);
-      }
-    } catch (err) {
-      console.error('Failed to toggle favorite:', err);
-    }
-  };
 
   const coverUrl = currentSong?.cover_hash
     ? `/api/covers/${currentSong.cover_hash}`
@@ -159,8 +145,8 @@ export const PlayerBar: React.FC = () => {
 
             {currentSong && (
               <button
-                onClick={handleToggleFavorite}
-                className="hidden sm:block p-1 text-[var(--fg)] hover:scale-110 transition-transform cursor-pointer shrink-0 ml-1"
+                onClick={() => toggleFavorite(currentSong.id)}
+                className="p-1 text-[var(--fg)] hover:scale-110 transition-transform cursor-pointer shrink-0 ml-1"
                 title={isFav ? 'Remove from Favorites' : 'Add to Favorites'}
               >
                 <Heart className={`w-5 h-5 ${isFav ? 'fill-red-500 text-red-500' : ''}`} />
