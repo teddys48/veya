@@ -47,7 +47,7 @@ export const AlbumGrid: React.FC<AlbumGridProps> = ({ albums }) => {
             className="cursor-pointer group flex flex-col justify-between"
           >
             {/* Album Cover Art with Hover Play Button Overlay */}
-            <div className="relative aspect-square w-full mb-3 overflow-hidden border-2 border-black bg-gray-200 shadow-[2px_2px_0px_0px_#000] group">
+            <div className="relative aspect-square w-full mb-3 overflow-hidden border-2 border-black dark:border-[#4B4B5E] bg-gray-200 dark:bg-[#272734] shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#000] group">
               {coverUrl ? (
                 <img
                   src={coverUrl}

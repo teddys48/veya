@@ -101,7 +101,7 @@ export const PlayerBar: React.FC = () => {
 
   return (
     <>
-      <footer className="fixed bottom-14 md:bottom-0 left-0 right-0 z-50 bg-[var(--card-bg)] border-t-3 border-black p-3 select-none flex flex-col gap-2 shadow-[0_-4px_0px_0px_#000]">
+      <footer className="fixed bottom-14 md:bottom-0 left-0 right-0 z-50 bg-[var(--card-bg)] border-t-4 border-black dark:border-[var(--primary)] p-3 select-none flex flex-col gap-2 shadow-[0_-4px_0px_0px_#000]">
         {/* Seek Progress Bar */}
         <div className="flex items-center gap-2 px-2">
           <span className="text-xs font-mono font-bold text-[var(--fg)] min-w-[36px]">
