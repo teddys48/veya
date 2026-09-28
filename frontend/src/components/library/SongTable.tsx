@@ -53,19 +53,19 @@ export const SongTable: React.FC<SongTableProps> = ({ songs, playlists = [], onP
 
   return (
     <div className="neo-box overflow-hidden my-4">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+      <div className="w-full">
+        <table className="w-full text-left border-collapse table-fixed font-mono text-sm">
           <thead>
-            <tr className="border-b-3 border-black bg-[var(--primary)] text-black font-extrabold text-xs uppercase tracking-wider font-mono">
-              <th className="p-3 w-12 text-center">#</th>
-              <th className="p-3">Title</th>
-              <th className="p-3">Artist</th>
-              <th className="p-3 hidden md:table-cell">Album</th>
-              <th className="p-3 hidden sm:table-cell w-20 text-center">Duration</th>
-              <th className="p-3 w-28 text-right">Actions</th>
+            <tr className="border-b-3 border-black bg-[var(--primary)] text-black font-extrabold text-xs uppercase tracking-wider">
+              <th className="p-2.5 w-10 text-center">#</th>
+              <th className="p-2.5 w-[38%] sm:w-[32%] md:w-[30%]">Title</th>
+              <th className="p-2.5 w-[30%] sm:w-[24%] md:w-[22%]">Artist</th>
+              <th className="p-2.5 hidden md:table-cell md:w-[24%]">Album</th>
+              <th className="p-2.5 w-16 sm:w-20 text-center">Duration</th>
+              <th className="p-2.5 w-16 sm:w-20 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y-2 divide-black/20 font-mono text-sm">
+          <tbody className="divide-y-2 divide-black/20">
             {songs.map((song, index) => {
               const isCurrent = currentSong?.id === song.id;
               const coverUrl = song.cover_hash
@@ -82,10 +82,10 @@ export const SongTable: React.FC<SongTableProps> = ({ songs, playlists = [], onP
                   }`}
                 >
                   {/* Track Index / Play Trigger */}
-                  <td className="p-3 text-center">
+                  <td className="p-2.5 text-center">
                     <button
                       onClick={() => playSong(song, songs)}
-                      className="w-8 h-8 mx-auto flex items-center justify-center font-bold text-xs hover:bg-[var(--primary)] hover:text-black border border-black transition-all cursor-pointer"
+                      className="w-7 h-7 mx-auto flex items-center justify-center font-bold text-xs hover:bg-[var(--primary)] hover:text-black border border-black transition-all cursor-pointer"
                     >
                       {isCurrent && isPlaying ? (
                         <span className="animate-pulse text-green-600 font-extrabold">▶</span>
@@ -96,61 +96,69 @@ export const SongTable: React.FC<SongTableProps> = ({ songs, playlists = [], onP
                   </td>
 
                   {/* Title & Artwork with Hover Play Button Overlay */}
-                  <td className="p-3">
-                    <div className="flex items-center gap-3">
+                  <td className="p-2.5 overflow-hidden">
+                    <div className="flex items-center gap-2.5 min-w-0">
                       <div
                         onClick={() => playSong(song, songs)}
-                        className="relative w-10 h-10 border border-black shrink-0 bg-gray-200 overflow-hidden group/img cursor-pointer"
+                        className="relative w-8 h-8 border border-black shrink-0 bg-gray-200 overflow-hidden group/img cursor-pointer"
                       >
                         <img
                           src={coverUrl}
                           alt={song.title}
                           className="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-200"
                           onError={(e) => {
-                            (e.target as HTMLImageElement).src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>';
+                            (e.target as HTMLImageElement).src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>';
                           }}
                         />
                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/img:opacity-100 flex items-center justify-center transition-opacity">
-                          <Play className="w-5 h-5 text-[var(--primary)] fill-current" />
+                          <Play className="w-4 h-4 text-[var(--primary)] fill-current" />
                         </div>
                       </div>
 
-                      <div className="truncate">
-                        <p className="font-extrabold truncate text-[var(--fg)]">{song.title}</p>
-                        <p className="text-xs text-[var(--muted)] md:hidden truncate">{song.artist}</p>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-extrabold text-sm truncate text-[var(--fg)]" title={song.title}>
+                          {song.title}
+                        </p>
+                        <p className="text-xs text-[var(--fg)] opacity-80 md:hidden truncate" title={song.artist}>
+                          {song.artist}
+                        </p>
                       </div>
                     </div>
                   </td>
 
                   {/* Artist */}
-                  <td className="p-3 font-semibold truncate text-[var(--fg)]">{song.artist}</td>
+                  <td className="p-2.5 font-bold truncate text-[var(--fg)]" title={song.artist}>
+                    {song.artist}
+                  </td>
 
-                  {/* Album */}
-                  <td className="p-3 hidden md:table-cell text-[var(--muted)] truncate">{song.album}</td>
+                  {/* Album (High Contrast Color for both Light & Dark Theme!) */}
+                  <td className="p-2.5 hidden md:table-cell font-medium truncate text-[var(--fg)] opacity-95" title={song.album}>
+                    {song.album}
+                  </td>
 
                   {/* Duration */}
-                  <td className="p-3 hidden sm:table-cell text-center font-semibold text-[var(--fg)]">
+                  <td className="p-2.5 text-center font-bold text-xs text-[var(--fg)]">
                     {formatTime(song.duration)}
                   </td>
 
                   {/* Action Buttons */}
-                  <td className="p-3 text-right">
-                    <div className="flex items-center justify-end gap-1.5">
+                  <td className="p-2.5 text-right">
+                    <div className="flex items-center justify-end gap-1">
                       <button
                         onClick={() => handleToggleFavorite(song)}
-                        className="p-1.5 hover:bg-red-100 border border-black transition-colors cursor-pointer"
+                        className="p-1 hover:bg-red-100 dark:hover:bg-red-950 border border-black transition-colors cursor-pointer"
                         title={song.is_favorite ? 'Remove Favorite' : 'Favorite'}
                       >
-                        <Heart className={`w-4 h-4 ${song.is_favorite ? 'fill-red-500 text-red-500' : ''}`} />
+                        <Heart className={`w-3.5 h-3.5 ${song.is_favorite ? 'fill-red-500 text-red-500' : ''}`} />
                       </button>
 
                       {playlists.length > 0 && (
                         <button
                           onClick={() => setSelectedSongForPlaylist(song)}
-                          className="p-1.5 hover:bg-[var(--primary)] border border-black transition-colors cursor-pointer text-black"
+                          className="p-1 hover:bg-[var(--primary)] border border-black transition-colors cursor-pointer text-black"
                           title="Add to Playlist"
                         >
-                          <Plus className="w-4 h-4" />
+                          <Plus className="w-3.5 h-3.5" />
                         </button>
                       )}
                     </div>

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ChevronDown, Heart, ListMusic, Music, Play, X } from 'lucide-react';
-import { usePlayerStore } from '../../stores/usePlayerStore';
+import { usePlayerStore, getDisplayQueue } from '../../stores/usePlayerStore';
 import { formatTime } from './PlayerBar';
 import { api } from '../../services/api';
 import { Button } from '../ui/Button';
@@ -20,6 +20,15 @@ export const NowPlayingOverlay: React.FC = () => {
 
   const [isFav, setIsFav] = useState(currentSong?.is_favorite || false);
   const [activeTab, setActiveTab] = useState<'queue' | 'lyrics'>('queue');
+  const activeTrackRef = useRef<HTMLDivElement | null>(null);
+
+  const displayQueue = getDisplayQueue(queue, isShuffle, shuffleOrder);
+
+  useEffect(() => {
+    if (isExpanded && activeTab === 'queue' && activeTrackRef.current) {
+      activeTrackRef.current.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+  }, [isExpanded, activeTab, queueIndex]);
 
   if (!currentSong) return null;
 
@@ -41,11 +50,6 @@ export const NowPlayingOverlay: React.FC = () => {
   const coverUrl = currentSong.cover_hash
     ? `/api/covers/${currentSong.cover_hash}`
     : `/api/songs/${currentSong.id}/cover`;
-
-  // Dynamically compute display list based on active shuffle state
-  const displayQueue = isShuffle && shuffleOrder.length === queue.length
-    ? shuffleOrder.map((qIdx) => ({ song: queue[qIdx], originalIndex: qIdx }))
-    : queue.map((song, qIdx) => ({ song, originalIndex: qIdx }));
 
   // Fallback year calculation: use currentSong.year if between 1900 and 2100, otherwise 'Unknown'
   const displayYear = currentSong.year >= 1900 && currentSong.year <= 2100 ? currentSong.year : 'Unknown';
@@ -161,6 +165,7 @@ export const NowPlayingOverlay: React.FC = () => {
                   return (
                     <div
                       key={`${song.id}-${idx}`}
+                      ref={isCurrent ? activeTrackRef : null}
                       className={`neo-box-sm p-2 flex items-center justify-between gap-3 transition-all ${
                         isCurrent
                           ? '!bg-[var(--primary)] !text-black font-extrabold shadow-[3px_3px_0px_0px_#000]'
@@ -213,3 +218,4 @@ export const NowPlayingOverlay: React.FC = () => {
     </div>
   );
 };
+

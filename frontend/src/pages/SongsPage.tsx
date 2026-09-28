@@ -1,20 +1,49 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useLayoutEffect } from 'react';
 import { api } from '../services/api';
 import { Song, Playlist } from '../types';
 import { SongTable } from '../components/library/SongTable';
 import { SectionHeader } from '../components/library/SectionHeader';
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 import { Loader2 } from 'lucide-react';
+import { useScrollStore } from '../stores/useScrollStore';
+
+const PATH_KEY = '/songs';
 
 export const SongsPage: React.FC = () => {
-  const [songs, setSongs] = useState<Song[]>([]);
-  const [playlists, setPlaylists] = useState<Playlist[]>([]);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [total, setTotal] = useState(0);
-  const [sort, setSort] = useState('title');
-  const [loading, setLoading] = useState(true);
+  const cached = useScrollStore.getState().pageCaches[PATH_KEY];
+
+  const [songs, setSongs] = useState<Song[]>(cached?.data || []);
+  const [playlists, setPlaylists] = useState<Playlist[]>(cached?.extra?.playlists || []);
+  const [page, setPage] = useState(cached?.page || 1);
+  const [totalPages, setTotalPages] = useState(cached?.totalPages || 1);
+  const [total, setTotal] = useState(cached?.total || 0);
+  const [sort, setSort] = useState(cached?.extra?.sort || 'title');
+  const [loading, setLoading] = useState(!cached);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
+
+  // Sync state to cache whenever it changes
+  useEffect(() => {
+    if (songs.length > 0) {
+      useScrollStore.getState().setPageCache(PATH_KEY, {
+        data: songs,
+        page,
+        totalPages,
+        total,
+        extra: { playlists, sort },
+      });
+    }
+  }, [songs, playlists, page, totalPages, total, sort]);
+
+  // Restore scroll position after mount / render
+  useLayoutEffect(() => {
+    const savedScrollPos = useScrollStore.getState().scrollPositions[PATH_KEY];
+    if (savedScrollPos !== undefined && savedScrollPos > 0) {
+      const mainEl = document.getElementById('main-content-container');
+      if (mainEl) {
+        mainEl.scrollTop = savedScrollPos;
+      }
+    }
+  }, []);
 
   // Initial load or sort change
   const fetchInitialSongs = useCallback(async () => {
@@ -37,8 +66,10 @@ export const SongsPage: React.FC = () => {
   }, [sort]);
 
   useEffect(() => {
-    fetchInitialSongs();
-  }, [fetchInitialSongs]);
+    if (!cached) {
+      fetchInitialSongs();
+    }
+  }, [cached, fetchInitialSongs]);
 
   // Infinite scroll load more handler
   const loadMoreSongs = useCallback(async () => {
@@ -74,7 +105,10 @@ export const SongsPage: React.FC = () => {
             <select
               value={sort}
               onChange={(e) => {
-                setSort(e.target.value);
+                const newSort = e.target.value;
+                setSort(newSort);
+                // Clear cache on explicit sort change
+                useScrollStore.getState().clearPageCache(PATH_KEY);
               }}
               className="neo-input py-1 text-xs font-bold"
             >
@@ -107,3 +141,4 @@ export const SongsPage: React.FC = () => {
     </div>
   );
 };
+

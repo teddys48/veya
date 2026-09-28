@@ -1,18 +1,46 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useLayoutEffect } from 'react';
 import { api } from '../services/api';
 import { Album } from '../types';
 import { AlbumGrid } from '../components/library/AlbumGrid';
 import { SectionHeader } from '../components/library/SectionHeader';
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 import { Loader2 } from 'lucide-react';
+import { useScrollStore } from '../stores/useScrollStore';
+
+const PATH_KEY = '/albums';
 
 export const AlbumsPage: React.FC = () => {
-  const [albums, setAlbums] = useState<Album[]>([]);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const cached = useScrollStore.getState().pageCaches[PATH_KEY];
+
+  const [albums, setAlbums] = useState<Album[]>(cached?.data || []);
+  const [page, setPage] = useState(cached?.page || 1);
+  const [totalPages, setTotalPages] = useState(cached?.totalPages || 1);
+  const [total, setTotal] = useState(cached?.total || 0);
+  const [loading, setLoading] = useState(!cached);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
+
+  // Sync state to cache whenever it changes
+  useEffect(() => {
+    if (albums.length > 0) {
+      useScrollStore.getState().setPageCache(PATH_KEY, {
+        data: albums,
+        page,
+        totalPages,
+        total,
+      });
+    }
+  }, [albums, page, totalPages, total]);
+
+  // Restore scroll position after mount / render
+  useLayoutEffect(() => {
+    const savedScrollPos = useScrollStore.getState().scrollPositions[PATH_KEY];
+    if (savedScrollPos !== undefined && savedScrollPos > 0) {
+      const mainEl = document.getElementById('main-content-container');
+      if (mainEl) {
+        mainEl.scrollTop = savedScrollPos;
+      }
+    }
+  }, []);
 
   const fetchInitialAlbums = useCallback(async () => {
     try {
@@ -30,8 +58,10 @@ export const AlbumsPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    fetchInitialAlbums();
-  }, [fetchInitialAlbums]);
+    if (!cached) {
+      fetchInitialAlbums();
+    }
+  }, [cached, fetchInitialAlbums]);
 
   const loadMoreAlbums = useCallback(async () => {
     if (isFetchingMore || page >= totalPages) return;
@@ -78,3 +108,4 @@ export const AlbumsPage: React.FC = () => {
     </div>
   );
 };
+

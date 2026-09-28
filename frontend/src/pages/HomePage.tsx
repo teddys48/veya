@@ -58,7 +58,7 @@ export const HomePage: React.FC = () => {
           <h1 className="font-black text-3xl sm:text-4xl uppercase tracking-tighter text-[var(--fg)]">
             YOUR MUSIC, YOUR RULES.
           </h1>
-          <p className="font-mono text-sm font-bold text-[var(--muted)] max-w-lg">
+          <p className="font-mono text-sm font-bold text-[var(--fg)] opacity-90 max-w-lg">
             High performance self-hosted playback with instant range streaming and NeoBrutalism design.
           </p>
           <div className="pt-2 flex gap-3">

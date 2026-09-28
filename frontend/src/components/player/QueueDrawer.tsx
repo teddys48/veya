@@ -1,6 +1,6 @@
-import React from 'react';
-import { X, Trash2, ListMusic, Music } from 'lucide-react';
-import { usePlayerStore } from '../../stores/usePlayerStore';
+import React, { useEffect, useRef } from 'react';
+import { X, Trash2, ListMusic, Music, Play } from 'lucide-react';
+import { usePlayerStore, getDisplayQueue } from '../../stores/usePlayerStore';
 import { Button } from '../ui/Button';
 
 export interface QueueDrawerProps {
@@ -9,7 +9,16 @@ export interface QueueDrawerProps {
 }
 
 export const QueueDrawer: React.FC<QueueDrawerProps> = ({ isOpen, onClose }) => {
-  const { queue, queueIndex, currentSong, playQueueAt, removeFromQueue, clearQueue } = usePlayerStore();
+  const { queue, queueIndex, isShuffle, shuffleOrder, playQueueAt, removeFromQueue, clearQueue } = usePlayerStore();
+  const activeItemRef = useRef<HTMLDivElement | null>(null);
+
+  const displayQueue = getDisplayQueue(queue, isShuffle, shuffleOrder);
+
+  useEffect(() => {
+    if (isOpen && activeItemRef.current) {
+      activeItemRef.current.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+  }, [isOpen, queueIndex]);
 
   if (!isOpen) return null;
 
@@ -35,15 +44,15 @@ export const QueueDrawer: React.FC<QueueDrawerProps> = ({ isOpen, onClose }) => 
 
       {/* Queue Item List */}
       <div className="flex-1 overflow-y-auto p-3 space-y-2">
-        {queue.length === 0 ? (
+        {displayQueue.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center p-8 text-center text-[var(--muted)] font-mono">
             <Music className="w-12 h-12 mb-3 stroke-1" />
             <p className="font-bold text-base">QUEUE IS EMPTY</p>
             <p className="text-xs mt-1">Add songs from your library to start playing</p>
           </div>
         ) : (
-          queue.map((song, idx) => {
-            const isCurrent = idx === queueIndex;
+          displayQueue.map(({ song, originalIndex }, idx) => {
+            const isCurrent = originalIndex === queueIndex;
             const coverUrl = song.cover_hash
               ? `/api/covers/${song.cover_hash}`
               : `/api/songs/${song.id}/cover`;
@@ -51,14 +60,20 @@ export const QueueDrawer: React.FC<QueueDrawerProps> = ({ isOpen, onClose }) => 
             return (
               <div
                 key={`${song.id}-${idx}`}
+                ref={isCurrent ? activeItemRef : null}
                 className={`neo-box-sm p-2 flex items-center justify-between gap-3 transition-all ${
-                  isCurrent ? 'bg-[var(--primary)] text-black font-bold' : 'hover:bg-[var(--muted-bg)] text-[var(--fg)]'
+                  isCurrent
+                    ? '!bg-[var(--primary)] !text-black font-extrabold shadow-[3px_3px_0px_0px_#000]'
+                    : 'hover:bg-[var(--muted-bg)] text-[var(--fg)]'
                 }`}
               >
                 <button
-                  onClick={() => playQueueAt(idx)}
+                  onClick={() => playQueueAt(originalIndex)}
                   className="flex items-center gap-3 flex-1 min-w-0 text-left cursor-pointer"
                 >
+                  <div className="w-6 text-center text-xs font-mono font-bold shrink-0">
+                    {isCurrent ? <Play className="w-4 h-4 fill-black text-black mx-auto" /> : idx + 1}
+                  </div>
                   <img
                     src={coverUrl}
                     alt={song.title}
@@ -68,14 +83,16 @@ export const QueueDrawer: React.FC<QueueDrawerProps> = ({ isOpen, onClose }) => 
                     }}
                   />
                   <div className="truncate">
-                    <p className="font-bold text-sm truncate">{song.title}</p>
-                    <p className="text-xs font-mono opacity-80 truncate">{song.artist}</p>
+                    <p className={`font-bold text-sm truncate ${isCurrent ? '!text-black' : ''}`}>{song.title}</p>
+                    <p className={`text-xs font-mono opacity-90 truncate ${isCurrent ? '!text-black' : ''}`}>{song.artist}</p>
                   </div>
                 </button>
 
                 <button
-                  onClick={() => removeFromQueue(idx)}
-                  className="p-1.5 hover:bg-red-500 hover:text-white border border-black transition-colors cursor-pointer"
+                  onClick={() => removeFromQueue(originalIndex)}
+                  className={`p-1.5 border border-black transition-colors cursor-pointer shrink-0 ${
+                    isCurrent ? 'bg-black text-white hover:bg-red-600' : 'hover:bg-red-500 hover:text-white'
+                  }`}
                   title="Remove from queue"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -88,3 +105,4 @@ export const QueueDrawer: React.FC<QueueDrawerProps> = ({ isOpen, onClose }) => 
     </div>
   );
 };
+

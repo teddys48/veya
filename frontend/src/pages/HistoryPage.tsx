@@ -50,35 +50,41 @@ export const HistoryPage: React.FC = () => {
         </div>
       ) : (
         <div className="neo-box overflow-hidden my-4">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+          <div className="w-full">
+            <table className="w-full text-left border-collapse table-fixed font-mono text-sm">
               <thead>
-                <tr className="border-b-3 border-black bg-[var(--primary)] text-black font-extrabold text-xs uppercase tracking-wider font-mono">
-                  <th className="p-3 w-12 text-center">#</th>
-                  <th className="p-3">Song Title</th>
-                  <th className="p-3">Artist</th>
-                  <th className="p-3 hidden sm:table-cell">Album</th>
-                  <th className="p-3 text-right">Played At</th>
+                <tr className="border-b-3 border-black bg-[var(--primary)] text-black font-extrabold text-xs uppercase tracking-wider">
+                  <th className="p-2.5 w-10 text-center">#</th>
+                  <th className="p-2.5 w-[40%] sm:w-[32%] md:w-[28%]">Song Title</th>
+                  <th className="p-2.5 w-[30%] sm:w-[26%] md:w-[22%]">Artist</th>
+                  <th className="p-2.5 hidden md:table-cell md:w-[24%]">Album</th>
+                  <th className="p-2.5 w-28 sm:w-36 text-right">Played At</th>
                 </tr>
               </thead>
-              <tbody className="divide-y-2 divide-black/20 font-mono text-sm">
+              <tbody className="divide-y-2 divide-black/20">
                 {history.map((h, idx) => {
                   if (!h.song) return null;
                   const song = h.song;
                   return (
-                    <tr key={`${h.id}-${idx}`} className="hover:bg-[var(--muted-bg)] text-[var(--fg)]">
-                      <td className="p-3 text-center">
+                    <tr key={`${h.id}-${idx}`} className="hover:bg-[var(--muted-bg)] text-[var(--fg)] transition-colors">
+                      <td className="p-2.5 text-center">
                         <button
                           onClick={() => playSong(song)}
-                          className="w-8 h-8 mx-auto flex items-center justify-center font-bold text-xs hover:bg-[var(--primary)] hover:text-black border border-black transition-all cursor-pointer"
+                          className="w-7 h-7 mx-auto flex items-center justify-center font-bold text-xs hover:bg-[var(--primary)] hover:text-black border border-black transition-all cursor-pointer"
                         >
                           <Play className="w-3.5 h-3.5 fill-current" />
                         </button>
                       </td>
-                      <td className="p-3 font-extrabold truncate">{song.title}</td>
-                      <td className="p-3 font-semibold truncate">{song.artist}</td>
-                      <td className="p-3 hidden sm:table-cell text-[var(--muted)] truncate">{song.album}</td>
-                      <td className="p-3 text-right text-xs text-[var(--muted)] font-bold">
+                      <td className="p-2.5 font-extrabold truncate text-[var(--fg)]" title={song.title}>
+                        {song.title}
+                      </td>
+                      <td className="p-2.5 font-bold truncate text-[var(--fg)]" title={song.artist}>
+                        {song.artist}
+                      </td>
+                      <td className="p-2.5 hidden md:table-cell font-medium truncate text-[var(--fg)] opacity-95" title={song.album}>
+                        {song.album}
+                      </td>
+                      <td className="p-2.5 text-right text-xs text-[var(--fg)] font-bold opacity-90 truncate">
                         {formatHistoryDate(h.played_at)}
                       </td>
                     </tr>

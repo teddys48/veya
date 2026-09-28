@@ -1,18 +1,46 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useLayoutEffect } from 'react';
 import { api } from '../services/api';
 import { Artist } from '../types';
 import { ArtistGrid } from '../components/library/ArtistGrid';
 import { SectionHeader } from '../components/library/SectionHeader';
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 import { Loader2 } from 'lucide-react';
+import { useScrollStore } from '../stores/useScrollStore';
+
+const PATH_KEY = '/artists';
 
 export const ArtistsPage: React.FC = () => {
-  const [artists, setArtists] = useState<Artist[]>([]);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const cached = useScrollStore.getState().pageCaches[PATH_KEY];
+
+  const [artists, setArtists] = useState<Artist[]>(cached?.data || []);
+  const [page, setPage] = useState(cached?.page || 1);
+  const [totalPages, setTotalPages] = useState(cached?.totalPages || 1);
+  const [total, setTotal] = useState(cached?.total || 0);
+  const [loading, setLoading] = useState(!cached);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
+
+  // Sync state to cache whenever it changes
+  useEffect(() => {
+    if (artists.length > 0) {
+      useScrollStore.getState().setPageCache(PATH_KEY, {
+        data: artists,
+        page,
+        totalPages,
+        total,
+      });
+    }
+  }, [artists, page, totalPages, total]);
+
+  // Restore scroll position after mount / render
+  useLayoutEffect(() => {
+    const savedScrollPos = useScrollStore.getState().scrollPositions[PATH_KEY];
+    if (savedScrollPos !== undefined && savedScrollPos > 0) {
+      const mainEl = document.getElementById('main-content-container');
+      if (mainEl) {
+        mainEl.scrollTop = savedScrollPos;
+      }
+    }
+  }, []);
 
   const fetchInitialArtists = useCallback(async () => {
     try {
@@ -30,8 +58,10 @@ export const ArtistsPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    fetchInitialArtists();
-  }, [fetchInitialArtists]);
+    if (!cached) {
+      fetchInitialArtists();
+    }
+  }, [cached, fetchInitialArtists]);
 
   const loadMoreArtists = useCallback(async () => {
     if (isFetchingMore || page >= totalPages) return;
@@ -78,3 +108,4 @@ export const ArtistsPage: React.FC = () => {
     </div>
   );
 };
+

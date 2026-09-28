@@ -59,6 +59,13 @@ const savedRepeat = (localStorage.getItem('veya_repeat') as RepeatMode) || 'off'
 audioEngine.setVolume(savedMuted ? 0 : savedVolume);
 audioEngine.setMuted(savedMuted);
 
+export function getDisplayQueue(queue: Song[], isShuffle: boolean, shuffleOrder: number[]) {
+  if (isShuffle && shuffleOrder && shuffleOrder.length === queue.length) {
+    return shuffleOrder.map((qIdx) => ({ song: queue[qIdx], originalIndex: qIdx }));
+  }
+  return queue.map((song, qIdx) => ({ song, originalIndex: qIdx }));
+}
+
 export const usePlayerStore = create<PlayerState>((set, get) => {
   audioEngine.setCallbacks({
     onTimeUpdate: (currentTime) => {
@@ -144,14 +151,20 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
 
       const song = queue[index];
       let sIdx = 0;
+      let newShuffleOrder = shuffleOrder;
+
       if (isShuffle) {
         sIdx = shuffleOrder.indexOf(index);
-        if (sIdx === -1) sIdx = 0;
+        if (sIdx === -1) {
+          newShuffleOrder = generateShuffleOrder(queue.length, index);
+          sIdx = 0;
+        }
       }
 
       set({
         currentSong: song,
         queueIndex: index,
+        shuffleOrder: newShuffleOrder,
         shuffleIndex: sIdx,
         hasLoggedHistory: false,
         progress: 0,
@@ -309,19 +322,52 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
 
     removeFromQueue: (index) => {
       set((state) => {
+        if (index < 0 || index >= state.queue.length) return state;
+
         const newQueue = state.queue.filter((_, i) => i !== index);
+
+        if (newQueue.length === 0) {
+          audioEngine.pause();
+          return {
+            currentSong: null,
+            queue: [],
+            queueIndex: -1,
+            shuffleOrder: [],
+            shuffleIndex: -1,
+            isPlaying: false,
+            progress: 0,
+          };
+        }
+
         let newQueueIndex = state.queueIndex;
+        let nextSong = state.currentSong;
+
         if (index < state.queueIndex) {
           newQueueIndex--;
-        } else if (index === state.queueIndex && newQueue.length > 0) {
+        } else if (index === state.queueIndex) {
           newQueueIndex = Math.min(index, newQueue.length - 1);
+          nextSong = newQueue[newQueueIndex];
+          audioEngine.load(`/api/songs/${nextSong.id}/stream`, true);
         }
-        const newShuffleOrder = generateShuffleOrder(newQueue.length, Math.max(0, newQueueIndex));
+
+        const newShuffleOrder = state.shuffleOrder
+          .filter((i) => i !== index)
+          .map((i) => (i > index ? i - 1 : i));
+
+        let newShuffleIndex = state.shuffleIndex;
+        if (state.isShuffle) {
+          newShuffleIndex = newShuffleOrder.indexOf(newQueueIndex);
+          if (newShuffleIndex === -1) newShuffleIndex = 0;
+        }
+
         return {
+          currentSong: nextSong,
           queue: newQueue,
           queueIndex: newQueueIndex,
           shuffleOrder: newShuffleOrder,
-          shuffleIndex: 0,
+          shuffleIndex: newShuffleIndex,
+          hasLoggedHistory: index === state.queueIndex ? false : state.hasLoggedHistory,
+          progress: index === state.queueIndex ? 0 : state.progress,
         };
       });
     },

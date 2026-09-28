@@ -2,41 +2,53 @@
 
 @layer base {
   :root {
-    --bg: #F5F3EF;
-    --fg: #0F0F12;
-    --card-bg: #FFFFFF;
-    --primary: #FFE600;
-    --primary-hover: #FFD600;
-    --accent-pink: #FF69B4;
-    --accent-cyan: #00E5FF;
-    --accent-green: #A3E635;
-    --accent-orange: #FF8400;
+    --bg: #f5f3ef;
+    --fg: #0f0f12;
+    --card-bg: #ffffff;
+    --primary: #ffe600;
+    --primary-hover: #ffd600;
+    --accent-pink: #ff69b4;
+    --accent-cyan: #00e5ff;
+    --accent-green: #a3e635;
+    --accent-orange: #ff8400;
     --border-color: #000000;
     --shadow-color: #000000;
     --muted: #374151; /* Dark charcoal for WCAG AAA contrast ratio (8.9:1) on light background */
-    --muted-bg: #E5E7EB;
+    --muted-bg: #e5e7eb;
   }
 
   html.dark {
-    --bg: #121216;
-    --fg: #F3F4F6;
-    --card-bg: #1E1E28;
-    --primary: #FFE600;
-    --primary-hover: #FFD600;
-    --accent-pink: #FF69B4;
-    --accent-cyan: #00E5FF;
-    --accent-green: #A3E635;
-    --accent-orange: #FF8400;
-    --border-color: #3D3D4E; /* High-contrast border in Dark Mode */
+    --bg: #171717;
+    --fg: #f5f5f0;
+
+    --card-bg: #242424;
+
+    --primary: #ffd84d;
+    --primary-hover: #ffe477;
+
+    --accent-pink: #ff6b9d;
+    --accent-cyan: #5bcefa;
+    --accent-green: #63d471;
+    --accent-orange: #ff914d;
+
+    --border-color: #f5f5f0;
     --shadow-color: #000000;
-    --muted: #A1A1B2;
-    --muted-bg: #272734;
+
+    --muted: #a3a3a3;
+    --muted-bg: #2e2e2e;
   }
 
   body {
     background-color: var(--bg);
     color: var(--fg);
-    font-family: 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family:
+      "Space Grotesk",
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
   }
@@ -115,7 +127,7 @@ html.dark .neo-card,
 html.dark .neo-box-sm,
 html.dark .neo-btn,
 html.dark .neo-input {
-  border-color: #3D3D4E;
+  border-color: #3d3d4e;
   box-shadow: 4px 4px 0px 0px #000000;
 }
 
