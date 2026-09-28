@@ -8,11 +8,15 @@ interface ThemeState {
 
 export const useThemeStore = create<ThemeState>((set) => {
   const initialDark = typeof window !== 'undefined'
-    ? localStorage.getItem('veya_theme') === 'dark' || window.matchMedia('(prefers-color-scheme: dark)').matches
+    ? localStorage.getItem('veya_theme') === 'dark'
     : false;
 
-  if (initialDark && typeof document !== 'undefined') {
-    document.documentElement.classList.add('dark');
+  if (typeof document !== 'undefined') {
+    if (initialDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   }
 
   return {
