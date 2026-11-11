@@ -51,16 +51,16 @@ export const SongTable: React.FC<SongTableProps> = ({ songs, playlists = [], onP
       <div className="w-full">
         <table className="w-full text-left border-collapse table-fixed font-mono text-sm">
           <thead>
-            <tr className="border-b-3 border-black bg-[var(--primary)] text-black font-extrabold text-xs uppercase tracking-wider">
-              <th className="p-2.5 w-10 text-center">#</th>
-              <th className="p-2.5 w-[38%] sm:w-[32%] md:w-[30%]">Title</th>
-              <th className="p-2.5 w-[30%] sm:w-[24%] md:w-[22%]">Artist</th>
-              <th className="p-2.5 hidden md:table-cell md:w-[24%]">Album</th>
-              <th className="p-2.5 w-16 sm:w-20 text-center">Duration</th>
-              <th className="p-2.5 w-16 sm:w-20 text-right">Actions</th>
+            <tr className="border-b-3 border-[var(--border-color)] bg-[var(--primary)] text-black font-extrabold text-xs uppercase tracking-wider">
+              <th scope="col" className="p-2.5 w-10 text-center">#</th>
+              <th scope="col" className="p-2.5 w-[38%] sm:w-[32%] md:w-[30%]">Title</th>
+              <th scope="col" className="p-2.5 w-[30%] sm:w-[24%] md:w-[22%]">Artist</th>
+              <th scope="col" className="p-2.5 hidden md:table-cell md:w-[24%]">Album</th>
+              <th scope="col" className="p-2.5 w-16 sm:w-20 text-center">Duration</th>
+              <th scope="col" className="p-2.5 w-20 sm:w-24 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y-2 divide-black/20">
+          <tbody className="divide-y-2 divide-[var(--border-color)]/20">
             {songs.map((song, index) => {
               const isCurrent = currentSong?.id === song.id;
               const coverUrl = song.cover_hash
@@ -79,11 +79,13 @@ export const SongTable: React.FC<SongTableProps> = ({ songs, playlists = [], onP
                   {/* Track Index / Play Trigger */}
                   <td className="p-2.5 text-center">
                     <button
+                      type="button"
                       onClick={() => playSong(song, songs)}
-                      className="w-7 h-7 mx-auto flex items-center justify-center font-bold text-xs hover:bg-[var(--primary)] hover:text-black border border-black transition-all cursor-pointer"
+                      aria-label={`Play track ${index + 1}: ${song.title} by ${song.artist}`}
+                      className="w-8 h-8 mx-auto flex items-center justify-center font-bold text-xs hover:bg-[var(--primary)] hover:text-black border border-[var(--border-color)] transition-all cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--primary)]"
                     >
                       {isCurrent && isPlaying ? (
-                        <span className="animate-pulse text-green-600 font-extrabold">▶</span>
+                        <span className="animate-pulse text-green-600 font-extrabold" aria-label="Playing">▶</span>
                       ) : (
                         <span>{index + 1}</span>
                       )}
@@ -93,13 +95,17 @@ export const SongTable: React.FC<SongTableProps> = ({ songs, playlists = [], onP
                   {/* Title & Artwork with Hover Play Button Overlay */}
                   <td className="p-2.5 overflow-hidden">
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div
+                      <button
+                        type="button"
                         onClick={() => playSong(song, songs)}
-                        className="relative w-8 h-8 border border-black shrink-0 bg-gray-200 overflow-hidden group/img cursor-pointer"
+                        aria-label={`Play ${song.title}`}
+                        className="relative w-8 h-8 border border-[var(--border-color)] shrink-0 bg-[var(--muted-bg)] overflow-hidden group/img cursor-pointer p-0 text-left focus-visible:outline-2 focus-visible:outline-[var(--primary)]"
                       >
                         <img
                           src={coverUrl}
-                          alt={song.title}
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-200"
                           onError={(e) => {
                             (e.target as HTMLImageElement).src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>';
@@ -108,7 +114,7 @@ export const SongTable: React.FC<SongTableProps> = ({ songs, playlists = [], onP
                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/img:opacity-100 flex items-center justify-center transition-opacity">
                           <Play className="w-4 h-4 text-[var(--primary)] fill-current" />
                         </div>
-                      </div>
+                      </button>
 
                       <div className="min-w-0 flex-1">
                         <p className="font-extrabold text-sm truncate text-[var(--fg)]" title={song.title}>
@@ -138,22 +144,26 @@ export const SongTable: React.FC<SongTableProps> = ({ songs, playlists = [], onP
 
                   {/* Action Buttons */}
                   <td className="p-2.5 text-right">
-                    <div className="flex items-center justify-end gap-1">
+                    <div className="flex items-center justify-end gap-1.5">
                       <button
+                        type="button"
                         onClick={() => handleToggleFavorite(song)}
-                        className="p-1 hover:bg-red-100 dark:hover:bg-red-950 border border-black transition-colors cursor-pointer"
+                        aria-label={song.is_favorite ? `Remove ${song.title} from favorites` : `Add ${song.title} to favorites`}
+                        className="p-1.5 min-w-[28px] min-h-[28px] flex items-center justify-center hover:bg-red-100 dark:hover:bg-red-950 border border-[var(--border-color)] transition-colors cursor-pointer"
                         title={song.is_favorite ? 'Remove Favorite' : 'Favorite'}
                       >
-                        <Heart className={`w-3.5 h-3.5 ${song.is_favorite ? 'fill-red-500 text-red-500' : ''}`} />
+                        <Heart className={`w-4 h-4 ${song.is_favorite ? 'fill-red-500 text-red-500' : ''}`} />
                       </button>
 
                       {playlists.length > 0 && (
                         <button
+                          type="button"
                           onClick={() => setSelectedSongForPlaylist(song)}
-                          className="p-1 hover:bg-[var(--primary)] border border-black transition-colors cursor-pointer text-black"
+                          aria-label={`Add ${song.title} to playlist`}
+                          className="p-1.5 min-w-[28px] min-h-[28px] flex items-center justify-center hover:bg-[var(--primary)] border border-[var(--border-color)] transition-colors cursor-pointer text-black"
                           title="Add to Playlist"
                         >
-                          <Plus className="w-3.5 h-3.5" />
+                          <Plus className="w-4 h-4" />
                         </button>
                       )}
                     </div>

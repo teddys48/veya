@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Play, Sparkles, ListMusic } from 'lucide-react';
+import { Play, ListMusic } from 'lucide-react';
 import { api } from '../services/api';
 import { Song, Album, Playlist } from '../types';
 import { SongTable } from '../components/library/SongTable';
@@ -51,10 +51,6 @@ export const HomePage: React.FC = () => {
       {/* Hero Banner with Dark Mode Adaptability */}
       <div className="neo-box bg-[var(--card-bg)] text-[var(--fg)] p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative overflow-hidden">
         <div className="space-y-3 z-10">
-          <div className="inline-flex items-center gap-2 bg-[var(--primary)] text-black font-mono text-xs font-bold px-3 py-1 uppercase tracking-widest border-2 border-black shadow-[2px_2px_0px_0px_#000]">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>SELF-HOSTED MUSIC ENGINE</span>
-          </div>
           <h1 className="font-black text-3xl sm:text-4xl uppercase tracking-tighter text-[var(--fg)]">
             YOUR MUSIC, YOUR RULES.
           </h1>

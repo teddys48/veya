@@ -87,8 +87,10 @@ export const PlaylistsPage: React.FC = () => {
                   <ListMusic className="w-6 h-6" />
                 </div>
                 <button
+                  type="button"
                   onClick={(e) => handleDeletePlaylist(e, pl.id)}
-                  className="p-1.5 border border-black hover:bg-red-500 hover:text-white transition-colors cursor-pointer"
+                  aria-label={`Delete playlist ${pl.name}`}
+                  className="p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center border border-[var(--border-color)] hover:bg-red-500 hover:text-white transition-colors cursor-pointer"
                   title="Delete playlist"
                 >
                   <Trash2 className="w-4 h-4" />

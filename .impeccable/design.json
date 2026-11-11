@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-11T09:27:30Z",
+  "title": "Design System: Veya Music",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Electric Caution Yellow",
+        "canonical": "#ffe600",
+        "tonalRamp": ["#fff9cc", "#fff280", "#ffe600", "#ffd600", "#b3a100"]
+      },
+      "primary-dark": {
+        "role": "primary",
+        "displayName": "Electric Caution Yellow (Dark)",
+        "canonical": "#ffd84d",
+        "tonalRamp": ["#fff2cc", "#ffe580", "#ffd84d", "#cca314", "#806600"]
+      },
+      "accent-cyan": {
+        "role": "secondary",
+        "displayName": "Cyber Cyan",
+        "canonical": "#00e5ff",
+        "tonalRamp": ["#ccfaff", "#80f2ff", "#00e5ff", "#00b4cc", "#007380"]
+      },
+      "accent-pink": {
+        "role": "secondary",
+        "displayName": "Acid Pink",
+        "canonical": "#ff69b4",
+        "tonalRamp": ["#ffe1f0", "#ffb3d9", "#ff69b4", "#cc3380", "#800040"]
+      },
+      "accent-green": {
+        "role": "secondary",
+        "displayName": "Radio Green",
+        "canonical": "#a3e635",
+        "tonalRamp": ["#ecfacc", "#d2f580", "#a3e635", "#7cb319", "#4f8000"]
+      },
+      "accent-orange": {
+        "role": "secondary",
+        "displayName": "Signal Orange",
+        "canonical": "#ff8400",
+        "tonalRamp": ["#ffe6cc", "#ffbf80", "#ff8400", "#cc6a00", "#804200"]
+      },
+      "neutral-bg": {
+        "role": "neutral",
+        "displayName": "Paper Light Canvas",
+        "canonical": "#f5f3ef",
+        "tonalRamp": ["#ffffff", "#faf9f7", "#f5f3ef", "#e5e3dd", "#b8b5ad"]
+      },
+      "card-bg": {
+        "role": "neutral",
+        "displayName": "Card Surface White",
+        "canonical": "#ffffff",
+        "tonalRamp": ["#ffffff", "#fafafa", "#f5f5f5", "#e5e5e5", "#a3a3a3"]
+      },
+      "dark-bg": {
+        "role": "neutral",
+        "displayName": "Onyx Dark Canvas",
+        "canonical": "#171717",
+        "tonalRamp": ["#2e2e2e", "#242424", "#171717", "#0f0f12", "#000000"]
+      },
+      "dark-card": {
+        "role": "neutral",
+        "displayName": "Slate Surface Dark",
+        "canonical": "#242424",
+        "tonalRamp": ["#3d3d4e", "#2e2e2e", "#242424", "#171717", "#0f0f12"]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Architectural Black",
+        "canonical": "#000000",
+        "tonalRamp": ["#374151", "#1f2937", "#111827", "#0f0f12", "#000000"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Brand headers, page heroes, and expanded Now Playing titles." },
+      "headline": { "displayName": "Headline", "purpose": "Album titles, artist names on detail pages, section headers." },
+      "title": { "displayName": "Title", "purpose": "Card titles, modal headers, track titles in rows." },
+      "body": { "displayName": "Body", "purpose": "General body text, descriptions, artist metadata." },
+      "label": { "displayName": "Label", "purpose": "Category chips, track durations, bitrates, audio formats, scanner statuses." }
+    },
+    "shadows": [
+      { "name": "neo-box", "value": "4px 4px 0px 0px #000000", "purpose": "Standard resting card and container elevation." },
+      { "name": "neo-box-sm", "value": "2px 2px 0px 0px #000000", "purpose": "Compact containers, chips, and badges." },
+      { "name": "neo-btn", "value": "3px 3px 0px 0px #000000", "purpose": "Resting interactive button elevation." },
+      { "name": "neo-btn-hover", "value": "5px 5px 0px 0px #000000", "purpose": "Hovered interactive button with -2px translate." },
+      { "name": "neo-btn-active", "value": "1px 1px 0px 0px #000000", "purpose": "Physically depressed button state on click." },
+      { "name": "neo-card-hover", "value": "7px 7px 0px 0px #000000", "purpose": "Lifted album and artist card state with -3px translate." }
+    ],
+    "motion": [
+      { "name": "ease-tactile", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Snappy mechanical spring-like transition for cards and drawers." },
+      { "name": "ease-btn", "value": "ease-in-out", "purpose": "Fast 0.15s button press transitions." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Primary action button with physical depression on click.",
+      "html": "<button class=\"neo-btn neo-btn-primary\">PLAY ALL</button>",
+      "css": ".neo-btn-primary { background: #ffe600; color: #000000; font-family: 'Space Grotesk', sans-serif; font-weight: 700; border: 2.5px solid #000000; box-shadow: 3px 3px 0px 0px #000000; padding: 8px 16px; border-radius: 0; cursor: pointer; transition: all 0.15s ease-in-out; } .neo-btn-primary:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0px 0px #000000; } .neo-btn-primary:active { transform: translate(0, 0); box-shadow: 1px 1px 0px 0px #000000; }"
+    },
+    {
+      "name": "Badge Chip",
+      "kind": "chip",
+      "refersTo": "badge",
+      "description": "Monospace technical indicator for formats, bitrates, and genres.",
+      "html": "<span class=\"neo-badge\">FLAC 24-BIT</span>",
+      "css": ".neo-badge { background: #ffe600; color: #000000; border: 2px solid #000000; box-shadow: 2px 2px 0px 0px #000000; font-family: ui-monospace, monospace; font-weight: 700; font-size: 0.75rem; padding: 2.4px 8px; text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; }"
+    },
+    {
+      "name": "Neo Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Rectangular container with 3px border and 4px hard shadow.",
+      "html": "<div class=\"neo-card\"><h3>Album Title</h3><p>Artist Name</p></div>",
+      "css": ".neo-card { background: #ffffff; border: 3px solid #000000; box-shadow: 4px 4px 0px 0px #000000; padding: 16px; border-radius: 0; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); } .neo-card:hover { transform: translate(-3px, -3px); box-shadow: 7px 7px 0px 0px #000000; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Tactile Tape Deck",
+    "overview": "Veya's visual system is inspired by vintage modular synthesizers, physical cassette decks, and industrial audio consoles. Rather than pretending to be an ethereal, weightless digital layer, the interface is deliberately heavy, mechanical, and tactile. Every card, button, and slider acts like a piece of rack-mounted hardware—grounded by stark black architectural borders, zero-blur structural drop shadows, and razor-sharp rectangular silhouettes.",
+    "keyCharacteristics": [
+      "Zero-Blur Structural Depth: Hard offset shadows (2px, 3px, 4px) with no blur provide structural elevation and simulate physical push-button depression.",
+      "Strictly Rectilinear Geometry: 0px border radius across all cards, buttons, badges, and modals.",
+      "Heavy Architectural Framing: High-contrast 2.5px to 3px solid borders delineate every functional boundary.",
+      "Mechanical Typography Pairing: High-contrast Space Grotesk display headings paired with raw, functional monospace readouts."
+    ],
+    "rules": [
+      {
+        "name": "The Physical Switch Rule",
+        "body": "Interactive elements must possess a thick border and hard offset shadow that physically depresses on click; primary yellow is reserved for active playback actions, active navigation states, and the primary brand mark.",
+        "section": "colors"
+      },
+      {
+        "name": "The Raw Readout Rule",
+        "body": "Track durations, bitrates, file extensions, audio channels, scanner progress lines, and category badges must always render in uppercase monospace (font-mono) to guarantee tabular alignment and technical instrument feel.",
+        "section": "typography"
+      },
+      {
+        "name": "The Hard Offset Rule",
+        "body": "Blurred shadows (box-shadow with blur-radius > 0px) are strictly prohibited across all surfaces. Elevation is communicated solely through crisp vector offset shadows and coordinate translation.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do use rounded-none (border-radius: 0px) for all buttons, cards, containers, inputs, and modals.",
+      "Do preserve hard offset shadows (box-shadow: Xpx Xpx 0px 0px var(--shadow-color)) with zero blur on every elevated surface.",
+      "Do render track durations, formats, bitrates, scanner outputs, and badges in uppercase monospace (font-mono).",
+      "Do apply the physical depression state (translate(0, 0) with 1px shadow) on :active button clicks.",
+      "Do reserve Electric Caution Yellow (#ffe600 / #ffd84d) for primary playback triggers, active navigation items, and high-priority actions."
+    ],
+    "donts": [
+      "Don't use diffuse, blurred drop shadows anywhere in the application.",
+      "Don't use rounded corners (rounded-sm, rounded-md, rounded-full) or pill-shaped buttons.",
+      "Don't introduce translucent glassmorphism (backdrop-blur, semi-transparent frosted cards).",
+      "Don't use soft pastel gradients or mesh gradients across cards or backgrounds.",
+      "Don't lower text contrast below WCAG AAA on body and metadata text."
+    ]
+  }
+}

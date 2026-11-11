@@ -33,16 +33,16 @@ export const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="w-64 border-r-3 border-black bg-[var(--card-bg)] flex flex-col h-full select-none hidden md:flex shrink-0">
+    <aside aria-label="Main Navigation" className="w-64 border-r-3 border-[var(--border-color)] bg-[var(--card-bg)] flex flex-col h-full select-none hidden md:flex shrink-0">
       {/* Brand Logo */}
-      <div className="p-5 border-b-3 border-black bg-[var(--primary)] text-black flex items-center justify-between">
+      <div className="p-5 border-b-3 border-[var(--border-color)] bg-[var(--primary)] text-black flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-black text-white flex items-center justify-center font-black text-xl border-2 border-black shadow-[2px_2px_0px_0px_#fff]">
             <Radio className="w-6 h-6 text-[var(--primary)]" />
           </div>
           <div>
             <h1 className="font-black text-2xl tracking-tighter uppercase leading-none">VEYA</h1>
-            <span className="text-[10px] font-mono font-extrabold uppercase tracking-widest bg-black text-white px-1 py-0.5 inline-block">
+            <span className="text-[11px] font-mono font-extrabold uppercase tracking-widest bg-black text-white px-1.5 py-0.5 inline-block">
               MUSIC PLAYER
             </span>
           </div>
@@ -50,7 +50,7 @@ export const Sidebar: React.FC = () => {
       </div>
 
       {/* Navigation Links */}
-      <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+      <nav aria-label="Library Navigation" className="flex-1 p-4 space-y-2 overflow-y-auto">
         {navItems.map((item) => {
           const Icon = item.icon;
           return (
@@ -58,22 +58,27 @@ export const Sidebar: React.FC = () => {
               key={item.to}
               to={item.to}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 font-bold border-2 border-black transition-all ${
+                `flex items-center gap-3 px-4 py-3 font-bold border-2 border-[var(--border-color)] transition-all ${
                   isActive
                     ? 'bg-[var(--primary)] text-black shadow-[3px_3px_0px_0px_#000] translate-x-1'
                     : 'bg-[var(--card-bg)] text-[var(--fg)] hover:bg-[var(--muted-bg)] hover:shadow-[2px_2px_0px_0px_#000]'
                 }`
               }
             >
-              <Icon className="w-5 h-5 shrink-0" />
-              <span className="font-mono text-sm tracking-wide">{item.label}</span>
+              {({ isActive }) => (
+                <>
+                  <Icon className="w-5 h-5 shrink-0" aria-hidden="true" />
+                  <span className="font-mono text-sm tracking-wide">{item.label}</span>
+                  {isActive && <span className="sr-only"> (current page)</span>}
+                </>
+              )}
             </NavLink>
           );
         })}
       </nav>
 
       {/* Library Scanner Action Footer */}
-      <div className="p-4 border-t-3 border-black bg-[var(--muted-bg)] space-y-3">
+      <div className="p-4 border-t-3 border-[var(--border-color)] bg-[var(--muted-bg)] space-y-3">
         <Button
           variant="accent"
           size="sm"

@@ -28,7 +28,7 @@ export const ArtistGrid: React.FC<ArtistGridProps> = ({ artists }) => {
           onClick={() => navigate(`/artists/${artist.id}`)}
           className="cursor-pointer group text-center flex flex-col items-center justify-between"
         >
-          <div className="w-24 h-24 rounded-full border-3 border-black bg-[var(--accent-pink)] text-black flex items-center justify-center my-3 shadow-[3px_3px_0px_0px_#000] group-hover:scale-105 transition-transform">
+          <div className="w-24 h-24 rounded-none border-3 border-[var(--border-color)] bg-[var(--accent-pink)] text-black flex items-center justify-center my-3 shadow-[3px_3px_0px_0px_#000] group-hover:scale-105 transition-transform">
             <Users className="w-10 h-10" />
           </div>
 

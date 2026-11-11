@@ -64,23 +64,31 @@ export const AlbumDetailPage: React.FC = () => {
 
       {/* Album Header Banner */}
       <div className="neo-box p-6 bg-[var(--card-bg)] flex flex-col sm:flex-row items-center sm:items-end gap-6">
-        <div
+        <button
+          type="button"
           onClick={handlePlayAlbum}
-          className="relative w-40 h-40 border-3 border-black bg-gray-200 shadow-[4px_4px_0px_0px_#000] shrink-0 overflow-hidden group cursor-pointer"
+          aria-label={`Play album ${album.title}`}
+          className="relative w-40 h-40 border-3 border-[var(--border-color)] bg-[var(--muted-bg)] shadow-[4px_4px_0px_0px_#000] shrink-0 overflow-hidden group cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--primary)] text-left p-0"
         >
           {coverUrl ? (
-            <img src={coverUrl} alt={album.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+            <img
+              src={coverUrl}
+              alt={album.title}
+              loading="lazy"
+              decoding="async"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-[var(--primary)] text-black">
               <Disc className="w-16 h-16" />
             </div>
           )}
           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-            <div className="neo-btn p-3 bg-[var(--primary)] text-black rounded-full border-2 border-black shadow-[3px_3px_0px_0px_#000]">
+            <div className="neo-btn p-3 bg-[var(--primary)] text-black rounded-none border-2 border-black shadow-[3px_3px_0px_0px_#000]">
               <Play className="w-8 h-8 fill-current ml-1" />
             </div>
           </div>
-        </div>
+        </button>
 
         <div className="space-y-2 text-center sm:text-left flex-1 min-w-0">
           <span className="text-xs font-mono font-extrabold uppercase bg-black text-white px-2 py-0.5 inline-block">

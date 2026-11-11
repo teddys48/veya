@@ -101,8 +101,10 @@ export const SongsPage: React.FC = () => {
         subtitle="Manage and play your entire track library with infinite scrolling"
         action={
           <div className="flex items-center gap-2 font-mono text-xs">
-            <span className="font-bold">SORT BY:</span>
+            <label htmlFor="sort-select" className="font-bold">SORT BY:</label>
             <select
+              id="sort-select"
+              aria-label="Sort library songs by"
               value={sort}
               onChange={(e) => {
                 const newSort = e.target.value;

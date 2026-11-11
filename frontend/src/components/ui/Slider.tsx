@@ -22,7 +22,7 @@ export const Slider: React.FC<SliderProps> = ({
   const percentage = max > 0 ? (value / max) * 100 : 0;
 
   return (
-    <div className={`relative flex items-center w-full select-none ${className}`}>
+    <div className={`relative flex items-center w-full py-1.5 select-none ${className}`}>
       <input
         type="range"
         min={min}
@@ -31,7 +31,7 @@ export const Slider: React.FC<SliderProps> = ({
         value={value}
         aria-label={ariaLabel}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full h-3 bg-[var(--muted-bg)] border-2 border-black accent-[var(--primary)] cursor-pointer appearance-none rounded-none shadow-[2px_2px_0px_0px_#000]"
+        className="w-full h-3.5 bg-[var(--muted-bg)] border-2 border-[var(--border-color)] accent-[var(--primary)] cursor-pointer appearance-none rounded-none shadow-[2px_2px_0px_0px_#000]"
         style={{
           background: `linear-gradient(to right, var(--primary) 0%, var(--primary) ${percentage}%, var(--muted-bg) ${percentage}%, var(--muted-bg) 100%)`,
         }}

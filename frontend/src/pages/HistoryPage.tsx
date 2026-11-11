@@ -53,15 +53,15 @@ export const HistoryPage: React.FC = () => {
           <div className="w-full">
             <table className="w-full text-left border-collapse table-fixed font-mono text-sm">
               <thead>
-                <tr className="border-b-3 border-black bg-[var(--primary)] text-black font-extrabold text-xs uppercase tracking-wider">
-                  <th className="p-2.5 w-10 text-center">#</th>
-                  <th className="p-2.5 w-[40%] sm:w-[32%] md:w-[28%]">Song Title</th>
-                  <th className="p-2.5 w-[30%] sm:w-[26%] md:w-[22%]">Artist</th>
-                  <th className="p-2.5 hidden md:table-cell md:w-[24%]">Album</th>
-                  <th className="p-2.5 w-28 sm:w-36 text-right">Played At</th>
+                <tr className="border-b-3 border-[var(--border-color)] bg-[var(--primary)] text-black font-extrabold text-xs uppercase tracking-wider">
+                  <th scope="col" className="p-2.5 w-10 text-center">#</th>
+                  <th scope="col" className="p-2.5 w-[40%] sm:w-[32%] md:w-[28%]">Song Title</th>
+                  <th scope="col" className="p-2.5 w-[30%] sm:w-[26%] md:w-[22%]">Artist</th>
+                  <th scope="col" className="p-2.5 hidden md:table-cell md:w-[24%]">Album</th>
+                  <th scope="col" className="p-2.5 w-28 sm:w-36 text-right">Played At</th>
                 </tr>
               </thead>
-              <tbody className="divide-y-2 divide-black/20">
+              <tbody className="divide-y-2 divide-[var(--border-color)]/20">
                 {history.map((h, idx) => {
                   if (!h.song) return null;
                   const song = h.song;
@@ -69,8 +69,10 @@ export const HistoryPage: React.FC = () => {
                     <tr key={`${h.id}-${idx}`} className="hover:bg-[var(--muted-bg)] text-[var(--fg)] transition-colors">
                       <td className="p-2.5 text-center">
                         <button
+                          type="button"
                           onClick={() => playSong(song)}
-                          className="w-7 h-7 mx-auto flex items-center justify-center font-bold text-xs hover:bg-[var(--primary)] hover:text-black border border-black transition-all cursor-pointer"
+                          aria-label={`Play ${song.title} by ${song.artist}`}
+                          className="w-8 h-8 mx-auto flex items-center justify-center font-bold text-xs hover:bg-[var(--primary)] hover:text-black border border-[var(--border-color)] transition-all cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--primary)]"
                         >
                           <Play className="w-3.5 h-3.5 fill-current" />
                         </button>

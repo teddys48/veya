@@ -47,11 +47,13 @@ export const AlbumGrid: React.FC<AlbumGridProps> = ({ albums }) => {
             className="cursor-pointer group flex flex-col justify-between"
           >
             {/* Album Cover Art with Hover Play Button Overlay */}
-            <div className="relative aspect-square w-full mb-3 overflow-hidden border-2 border-black dark:border-[#4B4B5E] bg-gray-200 dark:bg-[#272734] shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#000] group">
+            <div className="relative aspect-square w-full mb-3 overflow-hidden border-2 border-[var(--border-color)] bg-[var(--muted-bg)] shadow-[2px_2px_0px_0px_#000] group">
               {coverUrl ? (
                 <img
                   src={coverUrl}
                   alt={album.title}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = 'none';
@@ -67,7 +69,8 @@ export const AlbumGrid: React.FC<AlbumGridProps> = ({ albums }) => {
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center">
                 <button
                   onClick={(e) => handlePlayAlbum(e, album.id)}
-                  className="neo-btn p-3 bg-[var(--primary)] text-black rounded-full border-2 border-black shadow-[3px_3px_0px_0px_#000] hover:scale-110 active:scale-95 transition-all cursor-pointer"
+                  aria-label={`Play album ${album.title}`}
+                  className="neo-btn p-3 bg-[var(--primary)] text-black rounded-none border-2 border-black shadow-[3px_3px_0px_0px_#000] hover:scale-110 active:scale-95 transition-all cursor-pointer"
                   title="Play Album"
                 >
                   <Play className="w-6 h-6 fill-current ml-0.5" />
@@ -83,7 +86,7 @@ export const AlbumGrid: React.FC<AlbumGridProps> = ({ albums }) => {
               <p className="text-xs font-mono text-[var(--muted)] truncate mt-0.5">
                 {album.album_artist}
               </p>
-              <div className="flex items-center justify-between mt-2 pt-2 border-t-2 border-black/20 text-[10px] font-mono font-bold text-[var(--fg)]">
+              <div className="flex items-center justify-between mt-2 pt-2 border-t-2 border-[var(--border-color)]/20 text-xs font-mono font-bold text-[var(--fg)]">
                 <span>{album.year >= 1900 && album.year <= 2100 ? album.year : ''}</span>
                 <span>{album.song_count} TRACKS</span>
               </div>

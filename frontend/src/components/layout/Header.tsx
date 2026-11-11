@@ -16,20 +16,21 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="h-16 border-b-3 border-black bg-[var(--card-bg)] px-4 flex items-center justify-between gap-4 sticky top-0 z-30 shrink-0">
+    <header className="h-16 border-b-3 border-[var(--border-color)] bg-[var(--card-bg)] px-4 flex items-center justify-between gap-4 sticky top-0 z-30 shrink-0">
       {/* Search Input Bar */}
-      <form onSubmit={handleSearchSubmit} className="flex-1 max-w-md relative">
+      <form onSubmit={handleSearchSubmit} role="search" className="flex-1 max-w-md relative">
         <Input
-          type="text"
+          type="search"
           placeholder="Search songs, albums, artists..."
+          aria-label="Search songs, albums, artists"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="pr-10 text-sm py-1.5"
         />
         <button
           type="submit"
-          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-[var(--fg)] hover:scale-110 transition-transform cursor-pointer"
-          aria-label="Search"
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-[var(--fg)] hover:scale-110 transition-transform cursor-pointer"
+          aria-label="Submit search query"
         >
           <Search className="w-4 h-4" />
         </button>

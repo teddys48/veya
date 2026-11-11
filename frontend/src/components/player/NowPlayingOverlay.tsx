@@ -31,6 +31,16 @@ export const NowPlayingOverlay: React.FC = () => {
     }
   }, [isExpanded, activeTab, queueIndex]);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isExpanded) {
+        toggleExpanded();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isExpanded, toggleExpanded]);
+
   if (!currentSong) return null;
 
   const coverUrl = currentSong.cover_hash
@@ -42,6 +52,10 @@ export const NowPlayingOverlay: React.FC = () => {
 
   return (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Now Playing View"
+      aria-hidden={!isExpanded}
       className={`fixed inset-0 z-40 bg-[var(--bg)] text-[var(--fg)] flex flex-col overflow-hidden pb-36 transition-all duration-300 ease-in-out ${
         isExpanded
           ? 'translate-y-0 opacity-100 pointer-events-auto'
@@ -49,14 +63,14 @@ export const NowPlayingOverlay: React.FC = () => {
       }`}
     >
       {/* Top Header Bar */}
-      <div className="p-4 border-b-3 border-black bg-[var(--card-bg)] flex items-center justify-between shrink-0 shadow-[0_4px_0px_0px_#000]">
-        <Button variant="ghost" size="sm" onClick={toggleExpanded} className="gap-2">
+      <div className="p-4 border-b-3 border-[var(--border-color)] bg-[var(--card-bg)] flex items-center justify-between shrink-0 shadow-[0_4px_0px_0px_#000]">
+        <Button variant="ghost" size="sm" onClick={toggleExpanded} aria-label="Collapse Now Playing player" className="gap-2">
           <ChevronDown className="w-5 h-5" />
           <span className="font-extrabold uppercase">COLLAPSE PLAYER</span>
         </Button>
 
         <div className="text-center truncate max-w-md">
-          <span className="text-[10px] font-mono font-extrabold uppercase tracking-widest bg-[var(--primary)] text-black px-2 py-0.5 border border-black shadow-[2px_2px_0px_0px_#000]">
+          <span className="text-xs font-mono font-extrabold uppercase tracking-widest bg-[var(--primary)] text-black px-2 py-0.5 border border-black shadow-[2px_2px_0px_0px_#000]">
             NOW PLAYING
           </span>
           <p className="font-mono text-xs font-bold truncate text-[var(--muted)] mt-1">
@@ -64,7 +78,7 @@ export const NowPlayingOverlay: React.FC = () => {
           </p>
         </div>
 
-        <Button variant="ghost" size="sm" onClick={toggleExpanded} aria-label="Close Now Playing">
+        <Button variant="ghost" size="sm" onClick={toggleExpanded} aria-label="Close Now Playing overlay">
           <X className="w-5 h-5" />
         </Button>
       </div>
@@ -77,7 +91,9 @@ export const NowPlayingOverlay: React.FC = () => {
             <img
               src={coverUrl}
               alt={currentSong.title}
-              className="w-64 h-64 sm:w-80 sm:h-80 lg:w-[420px] lg:h-[420px] object-cover border-4 border-black shadow-[8px_8px_0px_0px_#000] bg-gray-200 transition-transform duration-300 group-hover:scale-102"
+              loading="lazy"
+              decoding="async"
+              className="w-64 h-64 sm:w-80 sm:h-80 lg:w-[420px] lg:h-[420px] object-cover border-4 border-[var(--border-color)] shadow-[8px_8px_0px_0px_#000] bg-[var(--muted-bg)] transition-transform duration-300 group-hover:scale-102"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>';
               }}
@@ -91,7 +107,8 @@ export const NowPlayingOverlay: React.FC = () => {
               </h2>
               <button
                 onClick={() => toggleFavorite(currentSong.id)}
-                className="p-2 border-2 border-black bg-[var(--card-bg)] shadow-[2px_2px_0px_0px_#000] hover:scale-110 transition-transform cursor-pointer shrink-0"
+                aria-label={isFav ? 'Remove track from favorites' : 'Add track to favorites'}
+                className="p-2 border-2 border-[var(--border-color)] bg-[var(--card-bg)] shadow-[2px_2px_0px_0px_#000] hover:scale-110 transition-transform cursor-pointer shrink-0 min-w-[40px] min-h-[40px] flex items-center justify-center"
                 title={isFav ? 'Remove Favorite' : 'Favorite'}
               >
                 <Heart className={`w-6 h-6 ${isFav ? 'fill-red-500 text-red-500' : 'text-[var(--fg)]'}`} />
@@ -106,10 +123,14 @@ export const NowPlayingOverlay: React.FC = () => {
         {/* Right Side: Up Next Queue Panel (YouTube Music Style) */}
         <div className="md:col-span-6 neo-box h-[480px] flex flex-col bg-[var(--card-bg)] shadow-[6px_6px_0px_0px_#000]">
           {/* Queue Tabs */}
-          <div className="flex border-b-3 border-black bg-[var(--muted-bg)] font-mono font-extrabold text-xs">
+          <div role="tablist" aria-label="Now Playing Tabs" className="flex border-b-3 border-[var(--border-color)] bg-[var(--muted-bg)] font-mono font-extrabold text-xs">
             <button
+              role="tab"
+              aria-selected={activeTab === 'queue'}
+              aria-controls="nowplaying-tabpanel-queue"
+              id="nowplaying-tab-queue"
               onClick={() => setActiveTab('queue')}
-              className={`flex-1 py-3 px-4 flex items-center justify-center gap-2 border-r-2 border-black transition-all cursor-pointer ${
+              className={`flex-1 py-3 px-4 flex items-center justify-center gap-2 border-r-2 border-[var(--border-color)] transition-all cursor-pointer ${
                 activeTab === 'queue'
                   ? 'bg-[var(--primary)] text-black shadow-[2px_2px_0px_0px_#000]'
                   : 'text-[var(--fg)] hover:bg-[var(--card-bg)]'
@@ -119,6 +140,10 @@ export const NowPlayingOverlay: React.FC = () => {
               <span>UP NEXT ({queue.length})</span>
             </button>
             <button
+              role="tab"
+              aria-selected={activeTab === 'lyrics'}
+              aria-controls="nowplaying-tabpanel-info"
+              id="nowplaying-tab-info"
               onClick={() => setActiveTab('lyrics')}
               className={`flex-1 py-3 px-4 flex items-center justify-center gap-2 transition-all cursor-pointer ${
                 activeTab === 'lyrics'
@@ -133,7 +158,7 @@ export const NowPlayingOverlay: React.FC = () => {
 
           {/* Tab Content */}
           {activeTab === 'queue' ? (
-            <div className="flex-1 overflow-y-auto p-3 space-y-2 font-mono">
+            <div id="nowplaying-tabpanel-queue" role="tabpanel" aria-labelledby="nowplaying-tab-queue" className="flex-1 overflow-y-auto p-3 space-y-2 font-mono">
               {displayQueue.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center p-8 text-center text-[var(--muted)]">
                   <p className="font-bold">Queue is empty</p>
@@ -168,7 +193,9 @@ export const NowPlayingOverlay: React.FC = () => {
                         <img
                           src={itemCoverUrl}
                           alt={song.title}
-                          className="w-10 h-10 object-cover border border-black shrink-0 bg-gray-200"
+                          loading="lazy"
+                          decoding="async"
+                          className="w-10 h-10 object-cover border border-[var(--border-color)] shrink-0 bg-[var(--muted-bg)]"
                           onError={(e) => {
                             (e.target as HTMLImageElement).src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>';
                           }}
@@ -188,7 +215,7 @@ export const NowPlayingOverlay: React.FC = () => {
               )}
             </div>
           ) : (
-            <div className="flex-1 overflow-y-auto p-6 font-mono space-y-4 text-sm text-[var(--fg)]">
+            <div id="nowplaying-tabpanel-info" role="tabpanel" aria-labelledby="nowplaying-tab-info" className="flex-1 overflow-y-auto p-6 font-mono space-y-4 text-sm text-[var(--fg)]">
               <div className="neo-box-sm p-4 space-y-2 bg-[var(--muted-bg)]">
                 <p><span className="font-bold">Title:</span> {currentSong.title}</p>
                 <p><span className="font-bold">Artist:</span> {currentSong.artist}</p>
